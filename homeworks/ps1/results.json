@@ -1,0 +1,46 @@
+{
+    "tests": [
+        {
+            "name": "test_1_check_expanded_states (principles_of_autonomy.notebook_tests.pset_1.TestPSet1.test_1_check_expanded_states)",
+            "score": 25,
+            "max_score": 25,
+            "status": "passed"
+        },
+        {
+            "name": "test_2_puzzle_problem_expanded_nodes (principles_of_autonomy.notebook_tests.pset_1.TestPSet1.test_2_puzzle_problem_expanded_nodes)",
+            "score": 10,
+            "max_score": 10,
+            "status": "passed"
+        },
+        {
+            "name": "test_3_bfs (principles_of_autonomy.notebook_tests.pset_1.TestPSet1.test_3_bfs)",
+            "score": 27,
+            "max_score": 27,
+            "status": "passed",
+            "output": "Solution: \n+-----+\n|  1 3|\n|4 2 5|\n|7 8 6|\n+-----+\n\n**\n\n+-----+\n|1   3|\n|4 2 5|\n|7 8 6|\n+-----+\n\n**\n\n+-----+\n|1 2 3|\n|4   5|\n|7 8 6|\n+-----+\n\n**\n\n+-----+\n|1 2 3|\n|4 5  |\n|7 8 6|\n+-----+\n\n**\n\n+-----+\n|1 2 3|\n|4 5 6|\n|7 8  |\n+-----+\n\n**\n\n"
+        },
+        {
+            "name": "test_4_dfs (principles_of_autonomy.notebook_tests.pset_1.TestPSet1.test_4_dfs)",
+            "score": 25,
+            "max_score": 25,
+            "status": "passed",
+            "output": "Solution: \n+-----+\n|1 2 3|\n|4 5 6|\n|7   8|\n+-----+\n\n**\n\n+-----+\n|1 2 3|\n|4 5 6|\n|7 8  |\n+-----+\n\n**\n\n"
+        },
+        {
+            "name": "test_5_adversarial_bfs_vs_dfs (principles_of_autonomy.notebook_tests.pset_1.TestPSet1.test_5_adversarial_bfs_vs_dfs)",
+            "score": 4,
+            "max_score": 4,
+            "status": "passed",
+            "output": "BFS: 4 states in the solution, 18 states explored.\nDFS: 9 states in the solution, 9 states explored.\n"
+        },
+        {
+            "name": "test_6_form_word (principles_of_autonomy.notebook_tests.pset_1.TestPSet1.test_6_form_word)",
+            "score": 5,
+            "max_score": 5,
+            "status": "passed"
+        }
+    ],
+    "leaderboard": [],
+    "execution_time": "0.56",
+    "score": 96
+}

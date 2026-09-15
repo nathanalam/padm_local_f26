@@ -6,4 +6,10 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "networkx>=3.6.1",
+    "principles-of-autonomy",
 ]
+
+[tool.uv.sources]
+principles-of-autonomy = { path = "../.." }

@@ -1,0 +1,146 @@
+import unittest
+import numpy as np
+import timeout_decorator
+from gradescope_utils.autograder_utils.decorators import weight
+# from nose.tools import assert_equal
+
+from principles_of_autonomy.grader import get_locals
+import numpy as np
+
+# Function for tests
+def test_ok():
+    try:
+        from IPython.display import display_html
+        display_html("""<div class="alert alert-success">
+        <strong>Test passed!!</strong>
+        </div>""", raw=True)
+    except:
+        print("test ok!!")
+
+class TestProj1(unittest.TestCase):
+    def __init__(self, test_name, notebook_locals):
+        super().__init__(test_name)
+        self.notebook_locals = notebook_locals
+
+    @weight(5)
+    def test_01_warmup_1(self):
+        State, sar_warmup1 = get_locals(self.notebook_locals, ["State", "sar_warmup1"])
+
+        minimal_state_map = np.array([['C', 'F'], ['S', 'W']])
+        sar_state = State(
+            hospital = (1, 1),
+            people = {"p1": (1, 0)},
+            state_map = minimal_state_map,
+        )
+
+        assert sar_warmup1(sar_state, 0, 0) == False, "Free spaces should NOT be considered obstacles"
+        assert sar_warmup1(sar_state, 0, 1) == False, "Fire should NOT be considered an obstacle"
+        assert sar_warmup1(sar_state, 1, 0) == False, "Smoke should NOT be considered an obstacle"
+        assert sar_warmup1(sar_state, 1, 1) == True, "Returned 'False' for a cell with an obstacle"
+
+        test_ok()
+
+    @weight(5)
+    def test_02_warmup_2(self):
+        sar_warmup2, SearchAndRescueProblem, execute_plan, State = get_locals(self.notebook_locals, ["sar_warmup2", "SearchAndRescueProblem", "execute_plan", "State"])
+        
+        problem = SearchAndRescueProblem()
+        plan = sar_warmup2()
+        state = execute_plan(problem, plan, State())
+        assert state.people["p1"] == (6, 6), f"p1 not delivered to the hospital location, still at {state.people['p1']}"
+
+        test_ok()
+
+    @weight(5)
+    def test_03_sar_pddl(self):
+        sar_pddl_problem, sar_pddl_state, sar_pddl_plan, execute_count_num_delivered = get_locals(self.notebook_locals, ["sar_pddl_problem", "sar_pddl_state", "sar_pddl_plan", "execute_count_num_delivered"])
+
+        assert sar_pddl_plan is not None, "Plan not found for feasible problem"
+        assert execute_count_num_delivered(problem=sar_pddl_problem, state=sar_pddl_state, plan=sar_pddl_plan, visualize=False) == 4, "All people not delivered to hospital"
+
+        test_ok()
+
+    @weight(10)
+    def test_04_infer_unknown(self):
+        infer_unknown_values = get_locals(self.notebook_locals, ["infer_unknown_values"])
+        assert infer_unknown_values([["U", "F"]]) == [["U", "F"]]
+        assert infer_unknown_values([["F", "U", "C"], ["S", "C", "U"], ["U", "U", "C"]]) == [["F", "S", "C"], ["S", "C", "C"], ["U", "U", "C"]]
+        assert infer_unknown_values([["U", "C", "C"], ["S", "C", "U"], ["U", "U", "C"]]) == [["C", "C", "C"], ["S", "C", "C"], ["F", "S", "C"]]
+        assert infer_unknown_values([["U", "S", "C", "U"], ["U", "U", "C", "U"], ["U", "S", "C", "U"]]) == [["F", "S", "C", "C"], ["U", "U", "C", "C"], ["F", "S", "C", "C"]]
+        assert infer_unknown_values([["U", "U", "C", "U", "U", "U", "U", "U"], ["C", "U", "U", "U", "U", "U", "U", "U"], ["U", "U", "U", "U", "U", "U", "U", "U"], ["U", "U", "U", "U", "U", "U", "C", "C"], ["U", "U", "U", "U", "U", "U", "C", "C"], ["U", "C", "U", "U", "U", "U", "U", "U"], ["U", "U", "U", "F", "U", "U", "U", "U"], ["U", "U", "U", "U", "U", "U", "U", "U"]]) == [["C", "C", "C", "U", "U", "U", "U", "U"], ["C", "U", "U", "U", "U", "U", "U", "U"], ["U", "U", "U", "U", "U", "U", "U", "U"], ["U", "U", "U", "U", "U", "U", "C", "C"], ["U", "U", "U", "U", "U", "U", "C", "C"], ["U", "C", "U", "U", "U", "U", "U", "U"], ["U", "U", "U", "F", "U", "U", "U", "U"], ["U", "U", "U", "U", "U", "U", "U", "U"]]
+        assert infer_unknown_values([["C", "U", "C", "U", "U", "C", "U"], ["U", "W", "W", "U", "C", "W", "W"], ["U", "F", "U", "U", "U", "F", "U"], ["C", "S", "W", "C", "U", "U", "U"], ["U", "U", "W", "U", "W", "U", "U"], ["C", "C", "U", "C", "U", "W", "U"], ["U", "W", "C", "U", "W", "U", "C"]]) == [["C", "C", "C", "C", "C", "C", "C"], ["C", "W", "W", "C", "C", "W", "W"], ["S", "F", "U", "U", "S", "F", "U"], ["C", "S", "W", "C", "U", "U", "U"], ["C", "C", "W", "C", "W", "U", "U"], ["C", "C", "C", "C", "C", "W", "U"], ["C", "W", "C", "C", "W", "C", "C"]]
+        assert infer_unknown_values([["C", "U", "C", "U", "U", "C", "U"], ["U", "W", "W", "U", "C", "W", "W"], ["U", "F", "U", "U", "U", "F", "U"], ["C", "S", "W", "C", "U", "F", "U"], ["U", "U", "W", "U", "W", "U", "U"], ["C", "C", "U", "C", "U", "W", "F"], ["U", "W", "C", "U", "W", "U", "U"]]) == [["C", "C", "C", "C", "C", "C", "C"], ["C", "W", "W", "C", "C", "W", "W"], ["S", "F", "U", "U", "S", "F", "U"], ["C", "S", "W", "C", "S", "F", "U"], ["C", "C", "W", "C", "W", "U", "U"], ["C", "C", "C", "C", "C", "W", "F"], ["C", "W", "C", "C", "W", "U", "U"]]
+
+        test_ok()
+
+    @weight(10)
+    def test_05_belief_update(self):
+        SearchAndRescueProblem, State, BeliefState = get_locals(self.notebook_locals, ["SearchAndRescueProblem", "State", "BeliefState"])
+
+        state_map = np.array([["C", "S", "C", "C", "C"], ["S", "F", "S", "C", "C"],
+                            ["S", "F", "S", "S", "S"], ["S", "F", "F", "F", "F"],
+                            ["C", "S", "S", "S", "S"], ["C", "C", "C", "C", "C"]])
+        beliefstate_map = np.array([["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"]])
+        problem = SearchAndRescueProblem()
+        state = State(state_map=state_map)
+        bel = BeliefState(state_map=beliefstate_map)
+        observation = problem.get_observation(state)
+        new_bel = bel.update(problem, observation)
+        assert new_bel.robot == (0, 0)
+        assert new_bel.state_map.tolist() == [['C', 'S', 'U', 'U', 'U'],
+                                            ['S', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U']]
+
+        state_map = np.array([["C", "S", "C", "C", "C"], ["S", "F", "S", "C", "C"],
+                            ["S", "F", "S", "S", "S"], ["S", "F", "F", "F", "F"],
+                            ["C", "S", "S", "S", "S"], ["C", "C", "C", "C", "C"]])
+        beliefstate_map = np.array([["U", "U", "U", "U", "U"],
+                                    ["S", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"],
+                                    ["U", "U", "U", "U", "U"]])
+        problem = SearchAndRescueProblem()
+        state = State(state_map=state_map)
+        bel = BeliefState(state_map=beliefstate_map)
+
+        new_state, _ = problem.get_next_state(state, 'down')
+        observation = problem.get_observation(new_state)
+        new_bel = bel.update(problem, observation, 'down')
+        assert new_bel.robot == (1, 0)
+        assert new_bel.state_map.tolist() == [['C', 'S', 'U', 'U', 'U'],
+                                            ['S', 'F', 'U', 'U', 'U'],
+                                            ['S', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U'],
+                                            ['U', 'U', 'U', 'U', 'U']]
+
+        test_ok()
+
+    @weight(7)
+    def test_06_safe_not_smart(self):
+        greedy_in_empty_result, greedy_in_default_distance = get_locals(self.notebook_locals, ["greedy_in_empty_result", "greedy_in_default_distance"])
+
+        s_or_f, final_state, final_bel = greedy_in_empty_result
+        assert final_state.robot == final_state.hospital, "Robot should be able to make it to the hospital in a clear map"
+        assert s_or_f == '*Success*', "Robot did not correctly report that it was successful"
+
+        assert greedy_in_default_distance < 12, "Despite being not-so-smart, the robot should at least get closer to the hospital than its start position"
+
+        test_ok()
+
+    @weight(7)
+    def test_07_safe_smart(self):
+        sar_policy_results, get_num_delivered = get_locals(self.notebook_locals, ["sar_policy_results", "get_num_delivered"])
+        s_or_f, final_state, final_bel = sar_policy_results
+        assert get_num_delivered(final_state) == 4, "All people not delivered to hospital"
+
+        test_ok()
