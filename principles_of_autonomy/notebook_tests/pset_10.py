@@ -1,6 +1,6 @@
 import unittest
 import torch
-import timeout_decorator
+from principles_of_autonomy.notebook_tests import timeout_decorator
 import numpy as np
 import re
 from gradescope_utils.autograder_utils.decorators import weight

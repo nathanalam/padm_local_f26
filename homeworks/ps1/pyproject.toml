@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "jupyter>=1.1.1",
+    "lab>=8.10",
     "matplotlib>=3.11.2",
     "networkx>=3.6.1",
     "principles-of-autonomy",
