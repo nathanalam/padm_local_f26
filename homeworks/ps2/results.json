@@ -1,0 +1,110 @@
+{
+    "tests": [
+        {
+            "name": "test_01_romania_graph (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_01_romania_graph)",
+            "score": 2,
+            "max_score": 2,
+            "status": "passed"
+        },
+        {
+            "name": "test_02_graph_search_problem (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_02_graph_search_problem)",
+            "score": 3,
+            "max_score": 3,
+            "status": "passed"
+        },
+        {
+            "name": "test_03_uniform_cost_search (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_03_uniform_cost_search)",
+            "score": 10,
+            "max_score": 10,
+            "status": "passed"
+        },
+        {
+            "name": "test_04_euclid_distance (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_04_euclid_distance)",
+            "score": 3,
+            "max_score": 3,
+            "status": "passed"
+        },
+        {
+            "name": "test_05_euclid_heuristic (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_05_euclid_heuristic)",
+            "score": 2,
+            "max_score": 2,
+            "status": "passed"
+        },
+        {
+            "name": "test_06_greedy (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_06_greedy)",
+            "score": 10,
+            "max_score": 10,
+            "status": "passed"
+        },
+        {
+            "name": "test_07_astar (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_07_astar)",
+            "score": 10,
+            "max_score": 10,
+            "status": "passed"
+        },
+        {
+            "name": "test_08_grid_to_graph (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_08_grid_to_graph)",
+            "score": 15,
+            "max_score": 15,
+            "status": "passed"
+        },
+        {
+            "name": "test_09_eucl_dist_cell (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_09_eucl_dist_cell)",
+            "score": 5,
+            "max_score": 5,
+            "status": "passed"
+        },
+        {
+            "name": "test_10_astar_grid (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_10_astar_grid)",
+            "score": 5,
+            "max_score": 5,
+            "status": "passed"
+        },
+        {
+            "name": "test_11_collision_testing (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_11_collision_testing)",
+            "score": 2,
+            "max_score": 2,
+            "status": "passed"
+        },
+        {
+            "name": "test_12_nearest_neighbor (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_12_nearest_neighbor)",
+            "score": 3,
+            "max_score": 3,
+            "status": "passed"
+        },
+        {
+            "name": "test_13_extend (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_13_extend)",
+            "score": 5,
+            "max_score": 5,
+            "status": "passed"
+        },
+        {
+            "name": "test_14_simple_environment (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_14_simple_environment)",
+            "score": 10,
+            "max_score": 10,
+            "status": "passed"
+        },
+        {
+            "name": "test_15_bugtrap_environment (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_15_bugtrap_environment)",
+            "score": 10,
+            "max_score": 10,
+            "status": "passed"
+        },
+        {
+            "name": "test_16_complex_environment (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_16_complex_environment)",
+            "score": 20,
+            "max_score": 20,
+            "status": "passed"
+        },
+        {
+            "name": "test_17_form_word (principles_of_autonomy.notebook_tests.pset_2.TestPSet2.test_17_form_word)",
+            "score": 0.0,
+            "max_score": 5,
+            "status": "failed",
+            "output": "Test Failed: Incorrect form word Wall-e\n"
+        }
+    ],
+    "leaderboard": [],
+    "execution_time": "0.00",
+    "score": 115.0
+}
