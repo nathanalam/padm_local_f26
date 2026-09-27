@@ -1,0 +1,16 @@
+[project]
+name = "ps3"
+version = "0.1.0"
+description = "Propositional logic homework"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.6.4",
+    "numpy>=2.1.0",
+    "principles-of-autonomy",
+    "sympy>=1.14.0",
+]
+
+[tool.uv.sources]
+principles-of-autonomy = { path = "../.." }
