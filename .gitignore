@@ -3,5 +3,10 @@
 __pycache__/
 .ipynb_checkpoints/
 *.zip
+<<<<<<< HEAD
 build
 *.egg-info
+=======
+*release_*.ipynb
+results.json
+>>>>>>> 73981e9f24efbdbfc32c1ba5de281b709b354eb5
