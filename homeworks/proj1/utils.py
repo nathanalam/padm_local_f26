@@ -399,6 +399,10 @@ def run_planning(domain_pddl_str,
     parser = Parser(domain_file.name, problem_file.name)
     domain = parser.parse_domain()
     problem = parser.parse_problem(domain)
+    # NamedTemporaryFile keeps the handle open. Windows will not delete it
+    # until that handle is closed.
+    domain_file.close()
+    problem_file.close()
     os.remove(domain_file.name)
     os.remove(problem_file.name)
 
