@@ -16,4 +16,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-principles-of-autonomy = { path = "../.." }
+principles-of-autonomy = { path = "../..", workplace = true }

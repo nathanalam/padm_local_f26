@@ -1,0 +1,18 @@
+[project]
+name = "ps7"
+version = "0.1.0"
+description = "RL Homework"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.6.4",
+    "matplotlib>=3.11.2",
+    "networkx>=3.7",
+    "numpy>=2.1.0",
+    "principles-of-autonomy",
+    "sympy>=1.14.0",
+]
+
+[tool.uv.sources]
+principles-of-autonomy = { path = "../.." }
