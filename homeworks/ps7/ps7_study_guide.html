@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS7 study guide — model-free reinforcement learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,460;8..60,600&family=Source+Sans+3:wght@420;560;680&family=Source+Code+Pro:wght@450;560&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --paper: #f3efe4;
+    --sheet: #faf7f0;
+    --ink: #1d1a16;
+    --muted: #5e574c;
+    --line: #ddd4c3;
+    --oxblood: #7d2a2a;
+    --oxblood-soft: #f3e4dc;
+    --pine: #1e5c45;
+    --pine-soft: #e4f0ea;
+    --gold: #8a5a12;
+    --gold-soft: #f8efd8;
+    --code: #241f1b;
+    --code-ink: #f6efe2;
+    --shadow: 0 1px 0 rgba(29, 26, 22, 0.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgba(125, 42, 42, 0.08), transparent 50%),
+      var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(243, 239, 228, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner, main { width: min(52rem, calc(100% - 2rem)); margin: 0 auto; }
+  .eyebrow {
+    margin: 0.85rem 0 0.15rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    font-weight: 680;
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.85rem;
+    line-height: 1.15;
+    margin: 0 0 0.7rem;
+  }
+  nav.jumps {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.75rem;
+  }
+  nav.jumps a {
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--sheet);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.86rem;
+  }
+  nav.jumps a:hover, nav.jumps a:focus-visible { border-color: var(--oxblood); color: var(--oxblood); }
+  main { padding: 1.4rem 0 4rem; }
+  section {
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--oxblood);
+    box-shadow: var(--shadow);
+    padding: 1.15rem 1.25rem 1.25rem;
+    margin: 0 0 1rem;
+    scroll-margin-top: 7.5rem;
+  }
+  section.shared { border-left-color: var(--pine); }
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+  }
+  h3 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.12rem;
+    margin: 1.15rem 0 0.35rem;
+  }
+  p { margin: 0.45rem 0; }
+  .kicker { color: var(--muted); font-size: 0.92rem; margin: 0 0 0.6rem; }
+  .eq {
+    background: #efe8d8;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+    overflow-x: auto;
+  }
+  .plain {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  code, .mono {
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.86em;
+  }
+  pre {
+    background: var(--code);
+    color: var(--code-ink);
+    padding: 0.8rem 0.95rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.45;
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.82rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.95rem;
+  }
+  th, td { text-align: left; padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 680; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 4.2rem);
+    gap: 0.35rem;
+    margin: 0.6rem 0;
+  }
+  .cell {
+    height: 3.1rem;
+    border: 1px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.78rem;
+    background: white;
+  }
+  .cell.goal { background: #d9ead3; }
+  .cell.obs { background: #222; color: #fff; }
+  .note, .hint, .feedback {
+    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    margin: 0.55rem 0;
+  }
+  .note { background: var(--pine-soft); }
+  .hint { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .hint[hidden] { display: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; margin: 0.4rem 0; }
+  button, .check button {
+    font: inherit;
+    background: var(--ink);
+    color: var(--sheet);
+    border: 0;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+  }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button:hover { background: var(--oxblood); }
+  button.ghost:hover { background: var(--oxblood-soft); color: var(--oxblood); }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--oxblood); outline-offset: 2px; }
+  label.slider { display: flex; gap: 0.6rem; align-items: center; font-size: 0.95rem; }
+  input[type="range"] { width: 10rem; accent-color: var(--oxblood); }
+  .widget {
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 0.75rem 0.85rem;
+    margin: 0.7rem 0;
+    background: #fffdf8;
+  }
+  .trace { width: 100%; font-variant-numeric: tabular-nums; }
+  .trace td:nth-child(n+3), .trace th:nth-child(n+3) { text-align: right; }
+  fieldset.check {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 0.8rem 0 0.2rem;
+    padding: 0.7rem 0.9rem 0.85rem;
+  }
+  fieldset.check legend { font-weight: 680; padding: 0 0.3rem; }
+  fieldset.check label { display: block; margin: 0.28rem 0; cursor: pointer; }
+  .feedback.good { background: var(--pine-soft); }
+  .feedback.bad { background: var(--oxblood-soft); }
+  .corridor { display: flex; gap: 0.3rem; flex-wrap: wrap; margin: 0.4rem 0 0.2rem; }
+  .corridor span {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-family: "Source Code Pro", monospace;
+    color: white;
+    background: #c8c0b2;
+  }
+  .muted { color: var(--muted); }
+  ul, ol { margin: 0.35rem 0 0.35rem 1.15rem; padding: 0; }
+  li { margin: 0.2rem 0; }
+  .sig {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.82rem;
+    background: #efe8d8;
+    padding: 0.45rem 0.6rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <p class="eyebrow">16.410 · Problem Set 7</p>
+    <h1>Model-free RL, without the slide hunt</h1>
+    <nav class="jumps" aria-label="Problems">
+      <a href="#setup">Setup</a>
+      <a href="#p1a">1A</a>
+      <a href="#p1b">1B</a>
+      <a href="#p1c">1C</a>
+      <a href="#p1d">1D</a>
+      <a href="#p2a">2A</a>
+      <a href="#p2b">2B</a>
+      <a href="#p2c">2C</a>
+      <a href="#p3a">3A</a>
+      <a href="#p3b">3B</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="shared" id="setup">
+    <h2>What each part is asking you to compute</h2>
+    <p>Passive methods (Problem 1) are given episodes from a fixed policy and estimate \(V^\pi\). Active methods (Problem 2) choose actions and estimate \(Q^*\). Problem 3 does not ask you to implement another agent. You design a world in which the lecture’s exploration bonus beats ε-greedy.</p>
+    <table>
+      <thead><tr><th>Part</th><th>You return</th><th>The one update that matters</th></tr></thead>
+      <tbody>
+        <tr><td>1A</td><td>\(V(s)\)</td><td>Average the first-visit discounted return</td></tr>
+        <tr><td>1C</td><td>\(V(s)\)</td><td>\(V(s) \leftarrow (1-\alpha)V(s) + \alpha[r + \gamma V(s')]\)</td></tr>
+        <tr><td>2A</td><td>\(Q(s,a)\) and \(\pi\)</td><td>Same blend, but the target is \(r + \gamma \max_{a'} Q(s', a')\), and actions are random</td></tr>
+        <tr><td>2B</td><td>\(Q(s,a)\) and \(\pi\)</td><td>Same Q update. Choose the greedy action, except with probability \(\varepsilon\) choose any legal action</td></tr>
+        <tr><td>3A</td><td><code>(mdp, start)</code></td><td>You do not code the agents. The bonus they use is \(f(u, n) = u + k/(n+1)\)</td></tr>
+      </tbody>
+    </table>
+    <h3>The world you already have</h3>
+    <p>States are \((x, y)\) with \(x\) to the right and \(y\) up. Actions are <code>up, down, right, left</code>, in that order. Intended direction succeeds with probability \(p = 0.8\); the two perpendicular directions split the remaining \(0.2\). Bumping a wall keeps you in place. Goal and obstacle cells are sinks: every action stays there and pays 0. The interesting rewards happen on the step <em>into</em> those cells.</p>
+    <div class="grid" aria-label="3 by 3 grid, y increases upward">
+      <div class="cell">(0,2)</div><div class="cell">(1,2)</div><div class="cell goal">(2,2) goal</div>
+      <div class="cell obs">(0,1)</div><div class="cell">(1,1)</div><div class="cell">(2,1)</div>
+      <div class="cell">(0,0)</div><div class="cell">(1,0)</div><div class="cell">(2,0)</div>
+    </div>
+    <p class="plain">Default rewards: \(+100\) for arriving at the goal, \(-1000\) for arriving at an obstacle, \(0\) otherwise. Problem 2C changes the obstacle penalty to \(-500\). Discount on the grid is \(\gamma = 0.8\). Problem 3 uses \(\gamma = 0.95\).</p>
+    <h3>What one episode looks like</h3>
+    <p>Each sample is <code>(state, action, next_state, reward)</code>. The reward is for the transition you just took, out of <code>state</code>. <code>generate_episodes</code> stops once <code>next_state</code> is a sink, so the last tuple is the one that collected \(+100\) or \(-1000\).</p>
+    <div class="note">
+      Do not read <code>mdp.T</code> or <code>mdp.R</code> inside your learners. <code>sample_environment</code> is the only legal way to see a next state and a reward in Problem 2. The fixed policy in Problem 1 is “always right.”
+    </div>
+  </section>
+
+  <section id="p1a">
+    <h2>1A · Direct evaluation</h2>
+    <p class="kicker">First-visit Monte Carlo · 15 points · Lecture 13</p>
+    <p class="sig">direct_evaluation(episodes, gamma) → dict[state, value]</p>
+    <p>Follow the fixed policy, and for each state write down “what did the rest of this episode end up being worth?” Average those numbers. You never build \(T\) or \(R\).</p>
+    <div class="eq">\[ G_t = \sum_{k=0}^{T-t-1} \gamma^k r_{t+k} \]</div>
+    <p class="plain">From the visit at time \(t\), add the reward in that tuple, plus \(\gamma\) times the next tuple’s reward, plus \(\gamma^2\) times the one after that, through the end of the episode. Then</p>
+    <div class="eq">\[ \hat V(s) = \text{average of } G_t \text{ over first visits to } s \]</div>
+    <p><strong>First visit</strong> means: inside one episode, the first time \(s\) appears as the <code>state</code> of a tuple, record \(G_t\). If \(s\) shows up again later in that same episode, skip it. The next episode gets a fresh “already seen” set. Every-visit would record every occurrence; that is the other variant, and it is not the one this part asks for.</p>
+    <div class="widget" id="return-widget">
+      <h3 style="margin-top:0">Compute a return yourself</h3>
+      <p class="plain">Episode, always-right, \(\gamma\) on the slider. Rewards sit on the transitions.</p>
+      <div class="row">
+        <label class="slider">γ <input id="ret-gamma" type="range" min="0" max="1" step="0.05" value="0.8"> <output id="ret-gamma-out">0.80</output></label>
+        <label class="slider">episode
+          <select id="ret-episode">
+            <option value="short">short: (1,1) → (2,1) → goal, rewards 0, 100</option>
+            <option value="revisit">(2,1) twice: rewards 0, 0, 100</option>
+          </select>
+        </label>
+      </div>
+      <table class="trace" id="ret-table"></table>
+      <p id="ret-summary"></p>
+    </div>
+    <div class="hints" data-hints="p1a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — bookkeeping.</strong> Keep a running sum and a count per state, not a list of every return. Reset a <code>seen</code> set at the start of each episode. States are tuples, so they can be dictionary keys directly.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — where the return starts.</strong> If the visit is at index \(i\), the sum uses <code>episode[i], episode[i+1], ...</code> only. The reward already in <code>episode[i]</code> is multiplied by \(\gamma^0\), not by \(\gamma^i\). Discounting by the index from the start of the episode makes early states look artificially small.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3 — the shape of the loop.</strong>
+        <pre>sums, counts = {}, {}
+for episode in episodes:
+    seen = set()
+    for i, (s, a, s2, r) in enumerate(episode):
+        if s in seen:
+            continue
+        seen.add(s)
+        G = 0
+        discount = 1
+        for (_, _, _, rk) in episode[i:]:
+            G += discount * rk
+            discount *= gamma
+        sums[s] = sums.get(s, 0) + G
+        counts[s] = counts.get(s, 0) + 1
+V[s] = sums[s] / counts[s]</pre>
+        Any state you saw only as a <code>next_state</code> never got a sample. Put those in <code>V</code> as 0 as well, including the goal and the obstacle. An episode that <em>starts</em> on a sink still records one transition worth 0, which is the right sample for a terminal state.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="First-visit keeps the earlier return only. That return already contains every later reward, discounted. Averaging both occurrences is every-visit, which this part explicitly says not to implement.">
+      <legend>Check: a state appears twice in one episode. What do you record?</legend>
+      <label><input type="radio" name="q1a" value="a"> Both returns, then average them</label>
+      <label><input type="radio" name="q1a" value="b"> Only the return from the earlier visit</label>
+      <label><input type="radio" name="q1a" value="c"> Only the return from the later visit</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <section id="p1b">
+    <h2>1B · Sample sensitivity</h2>
+    <p class="kicker">Written · 10 points · the objection Lecture 13 raises against direct evaluation</p>
+    <p>Rerun the 1A block at <code>num_episodes</code> of 100, 1,000, 10,000, and 100,000, a few times each. Watch which cells settle and which cells keep jumping.</p>
+    <div class="eq">\[ \mathrm{StdError}(\hat V(s)) \approx \frac{\sigma_s}{\sqrt{n_s}} \]</div>
+    <p class="plain">\(n_s\) is the number of first-visit returns for that state, not the number of episodes. \(\sigma_s\) is large here because a single return is a whole noisy trajectory: one slip into the obstacle contributes \(-1000\), and a slip the other way contributes \(+100\).</p>
+    <div class="hints" data-hints="p1b">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — what should move.</strong> Cells the always-right policy sits on, especially the right-hand column, get many returns and calm down first. Cells a random start rarely leads through stay noisy much longer. Run-to-run disagreement at 100 episodes, and agreement at 100,000, is the observation the question wants.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — why so many samples.</strong> Direct evaluation refuses to use the map. Learning that \((2,1)\) is often one slip away from \(+100\) does nothing for \((1,1)\) until \((1,1)\)’s own episodes finish. Two states that flow into the same successor can have very different estimates for a long time. That is the “B and E both go to C, so how can their values differ?” slide.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3 — a skeleton you fill with what you saw.</strong> Name a cell that was still swinging at 1,000 episodes and say roughly when it settled. Then one sentence on \(\sqrt{n}\): quadrupling that cell’s visits halves the typical error, so decades of episodes buy less than they feel like. Then the structural reason: each sample ignores every other state’s experience, and the returns themselves mix \(+100\) and \(-1000\).
+      </div>
+    </div>
+  </section>
+
+  <section id="p1c">
+    <h2>1C · Temporal difference</h2>
+    <p class="kicker">15 points · Lecture 13</p>
+    <p class="sig">td_learning(episodes, gamma, alpha) → dict[state, value]</p>
+    <p>Still a fixed policy. The change is that one transition is enough to learn, because the current guess \(V(s')\) stands in for “the rest of the episode.”</p>
+    <div class="eq">\[
+      \underbrace{r + \gamma V(s')}_{\text{TD target}}
+      \qquad
+      V(s) \leftarrow (1-\alpha)\, V(s) + \alpha \big[ r + \gamma V(s') \big]
+    \]</div>
+    <p class="plain">Same thing, written as a step toward the target: \(V(s) \leftarrow V(s) + \alpha \big( r + \gamma V(s') - V(s) \big)\). Use either form. \(\alpha\) is the learning rate, between 0 and 1. A missing state is worth 0.</p>
+    <div class="note">Update every tuple, including repeats of a state. Do not reset \(V\) between episodes. Do not sum the future rewards yourself: that sum is what \(V(s')\) is approximating. If you both add future rewards and bootstrap \(V(s')\), you double-count.</div>
+    <div class="widget" id="td-widget">
+      <h3 style="margin-top:0">One forward pass, by hand</h3>
+      <p class="plain">Same short episode as 1A: \((1,1) \xrightarrow{0} (2,1) \xrightarrow{100} (2,2)\). Values start at 0. Watch \((1,1)\) on this pass: when it is updated, \(V(2,1)\) is still 0, so the \(+100\) is invisible until a later visit.</p>
+      <div class="row">
+        <label class="slider">γ <input id="td-gamma" type="range" min="0" max="1" step="0.05" value="0.8"> <output id="td-gamma-out">0.80</output></label>
+        <label class="slider">α <input id="td-alpha" type="range" min="0" max="1" step="0.01" value="0.5"> <output id="td-alpha-out">0.50</output></label>
+      </div>
+      <table class="trace" id="td-table"></table>
+    </div>
+    <div class="hints" data-hints="p1c">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — order.</strong> Walk the episode from the first tuple to the last. The bootstrap uses the value of \(s'\) as it stands <em>now</em>, which on a forward pass is usually the value learned on earlier episodes, not the return still sitting later in this one.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — terminals.</strong> Entering the goal or the obstacle is an ordinary update of the state you left: the reward is \(+100\) or \(-1000\), and \(V(\text{sink})\) is 0 unless some episode started there and taught it something (those samples are also about 0). Then the episode stops. There is no extra update “at” the sink beyond tuples that list the sink as <code>state</code>.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3 — the loop.</strong>
+        <pre>V = {}
+for episode in episodes:
+    for (s, a, s2, r) in episode:
+        target = r + gamma * V.get(s2, 0.0)
+        old = V.get(s, 0.0)
+        V[s] = (1 - alpha) * old + alpha * target</pre>
+        After the loops, every state that appeared only as <code>s2</code> should still be present with value 0. The action is ignored: the policy is already baked into which transitions you were given.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="The target is one real reward plus a discounted guess at the successor. The full remaining sum of rewards is the Monte Carlo return from 1A. TD exists so you do not have to wait for that sum.">
+      <legend>Check: which quantity is the TD target?</legend>
+      <label><input type="radio" name="q1c" value="a"> The discounted sum of every later reward in the episode</label>
+      <label><input type="radio" name="q1c" value="b"> \(r + \gamma V(s')\)</label>
+      <label><input type="radio" name="q1c" value="c"> \(r + \gamma V(s)\)</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <section id="p1d">
+    <h2>1D · Learning rate</h2>
+    <p class="kicker">Written · 10 points · the exponential moving average slide</p>
+    <p>Same episodes, \(\alpha \in \{10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 0.5\}\). The update is a weighted average that forgets.</p>
+    <div class="eq">\[
+      \text{weight of a sample from } k \text{ visits ago} = \alpha (1-\alpha)^k
+    \]</div>
+    <p class="plain">The recent window is about \(1/\alpha\) visits of <em>that state</em>. Half the weight sits on the last \(\ln 2 / \alpha\) visits. Plug in the three regimes the question names:</p>
+    <table>
+      <thead><tr><th>\(\alpha\)</th><th>Window</th><th>What the grid does with \(10^5\) episodes</th></tr></thead>
+      <tbody>
+        <tr><td>\(10^{-5}\)</td><td>~100,000 visits of this cell</td><td>Most cells are not visited anywhere near that often, so \(V\) barely leaves its start at 0. Compared with \(\alpha = 0.01\), the map looks washed out.</td></tr>
+        <tr><td>\(0.01\)</td><td>~100 visits</td><td>Enough to average the \(p = 0.8\) slip noise on this 3×3, without throwing away the rest of the data. This is the value the notebook already uses.</td></tr>
+        <tr><td>\(0.5\)</td><td>~2 visits</td><td>The last hit dominates. One step into the obstacle (\(-1000\)) swings a neighbor from a sensible number to a huge negative one, and the next ordinary step swings it back.</td></tr>
+      </tbody>
+    </table>
+    <div class="hints" data-hints="p1d">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — say what you saw, then the window.</strong> Quote the three regimes with a cell you actually looked at. “Too small underfits, too big overfits” is not yet an answer; the \(1/\alpha\) window is the reason.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — a bigger MDP.</strong> The same fixed \(\alpha\) meets each state less often as the grid grows, so the under-update you saw at \(10^{-5}\) shows up at moderate \(\alpha\) too. Lecture 13’s caveat on Q-learning is the same knob: eventually make \(\alpha\) small, but not so fast that late samples never get a vote. Rare states and a non-stationary target (early \(V(s')\) is wrong) are why one \(\alpha\) does not travel.
+      </div>
+    </div>
+  </section>
+
+  <section id="p2a">
+    <h2>2A · Q-learning</h2>
+    <p class="kicker">Random actions · 15 points · Lecture 14</p>
+    <p class="sig">q_learning(num_episodes, mdp, gamma, alpha, max_steps=100) → Q, policy</p>
+    <p>Values \(V(s)\) cannot pick an action unless you already know \(T\) and \(R\). \(Q(s, a)\) can: the greedy policy is just the best action in that row. Q-learning is the TD update on those pairs, and it is <strong>off-policy</strong>. The target pretends that next time you will act optimally, no matter how badly you are acting now.</p>
+    <div class="eq">\[
+      Q(s, a) \leftarrow (1-\alpha)\, Q(s, a) + \alpha \Big[ r + \gamma \max_{a'} Q(s', a') \Big]
+    \]</div>
+    <div class="eq">\[ \pi(s) = \arg\max_a Q(s, a) \]</div>
+    <p class="plain">The starter already zeros \(Q\), loops over episodes, starts each one at <code>random.choice(list(mdp.S))</code>, and stops on a sink or at <code>max_steps</code>. Inside the loop the action is already <code>random.choice(mdp.A)</code>. Your job is the sample, the update, the move to \(s'\), and, after all episodes, the policy.</p>
+    <div class="widget" id="q-widget">
+      <h3 style="margin-top:0">One Q update</h3>
+      <div class="row">
+        <label class="slider">α <input id="q-alpha" type="range" min="0" max="1" step="0.01" value="0.1"> <output id="q-alpha-out">0.10</output></label>
+        <label class="slider">γ <input id="q-gamma" type="range" min="0" max="1" step="0.05" value="0.8"> <output id="q-gamma-out">0.80</output></label>
+      </div>
+      <div class="row">
+        <label class="slider">old \(Q(s,a)\) <input id="q-old" type="number" value="0" step="1" style="width:5rem"></label>
+        <label class="slider">\(r\) <input id="q-r" type="number" value="0" step="1" style="width:5rem"></label>
+        <label class="slider">\(\max_{a'} Q(s',a')\) <input id="q-max" type="number" value="50" step="1" style="width:5rem"></label>
+      </div>
+      <p id="q-out"></p>
+    </div>
+    <div class="hints" data-hints="p2a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — what “max” is not.</strong> It is the best action you <em>could</em> take in \(s'\), not the action you will sample on the next iteration, and not the action you just took. Using the next sampled action would be on-policy (SARSA). Q-learning stays off-policy on purpose, which is why random behavior can still learn the optimal policy.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — entering a sink.</strong> Call <code>sample_environment</code>, update the pair you just took, then set <code>state = next_state</code>. If that next state is the goal, \(\max_{a'} Q\) is 0 because those entries were initialized to 0 and the loop never acts from a sink. The \(+100\) is still applied to the state you left. The <code>while</code> condition ends the episode on the next check. Do not add another random call.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3 — the policy, and the autograder’s random stream.</strong> Build \(\pi\) once, after learning, not inside the episode loop.
+        <pre>policy = {
+    s: max(mdp.A, key=lambda a: Q[s][a])
+    for s in Q
+}</pre>
+        <code>max</code> keeps the first best action. On an all-zero row that is <code>up</code>, which is what a sink’s policy should be. Leave the starter’s <code>random.choice</code> lines where they are. An extra <code>random</code> call, or a <code>random.seed</code> inside the function, changes later samples and the numerical test will miss even if the update rule is right.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="Off-policy means the bootstrap does not have to match the behavior policy. The max is the best next action in the table. The action you actually take next is only used when that later step is updated.">
+      <legend>Check: the Q target bootstraps using…</legend>
+      <label><input type="radio" name="q2a" value="a"> the action the agent will actually take next</label>
+      <label><input type="radio" name="q2a" value="b"> the maximum Q over actions at the next state</label>
+      <label><input type="radio" name="q2a" value="c"> the action that was just taken</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <section id="p2b">
+    <h2>2B · ε-greedy Q-learning</h2>
+    <p class="kicker">10 points · Lecture 14, “random actions explore a fixed amount”</p>
+    <p class="sig">q_learning_epsilon_greedy(..., epsilon, max_steps=100) → Q, policy</p>
+    <p>Copy 2A. The update does not change. Only the choice of action changes.</p>
+    <div class="eq">\[
+      a =
+      \begin{cases}
+        \text{uniform among all legal actions} & \text{with probability }\varepsilon \\
+        \arg\max_{a'} Q(s, a') & \text{otherwise}
+      \end{cases}
+    \]</div>
+    <p>The random branch is allowed to return the greedy action. Do not sample “a random non-greedy action.” At \(\varepsilon = 0.5\) you exploit about half the time, which is why the same number of episodes produces a sharper Q table than pure random actions.</p>
+    <div class="hints" data-hints="p2b">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — the two lines the test requires.</strong> Every step, draw the coin flip first, and only then maybe draw an action:
+        <pre>if random.uniform(0, 1) &lt; epsilon:
+    action = random.choice(mdp.A)
+else:
+    action = max(mdp.A, key=lambda a: Q[state][a])</pre>
+        Exploiting must not call <code>random</code>. The rest of the function, including how an episode starts and how Q is updated, matches 2A.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — greedy during learning vs. the returned policy.</strong> The <code>else</code> branch is the behavior while learning, and it changes as Q changes. The dictionary you return is the greedy policy of the <em>final</em> Q, built once after the episode loop. Those two argmaxes should use the same tie-break (first action in <code>mdp.A</code>).
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="ε is the probability of drawing uniformly from the whole action list. That draw is independent of which action is currently best, so the best action remains possible. Filtering it out would not match the algorithm, and it would also burn a different random stream than the grader.">
+      <legend>Check: with probability ε the agent…</legend>
+      <label><input type="radio" name="q2b" value="a"> picks uniformly among actions that are currently suboptimal</label>
+      <label><input type="radio" name="q2b" value="b"> picks uniformly among every legal action, including the greedy one</label>
+      <label><input type="radio" name="q2b" value="c"> takes the greedy action and adds noise to the reward</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <section id="p2c">
+    <h2>2C · Exploration vs. exploitation</h2>
+    <p class="kicker">Written · 10 points · the 10×10 map</p>
+    <p>Goal \((5,8)\), obstacle reward \(-500\), \(\alpha = 0.01\), 50,000 episodes to start. Sweep \(\varepsilon \in \{0, 0.1, 0.5, 1\}\) and also try fewer or more episodes. \(\varepsilon = 0\) is pure exploitation. \(\varepsilon = 1\) is pure exploration. The policy you plot is still \(\arg\max Q\), even when behavior was random.</p>
+    <table>
+      <thead><tr><th>\(\varepsilon\)</th><th>Behavior</th><th>What usually goes wrong on this map</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>Always the current argmax. Ties are the first action, <code>up</code>, until some Q becomes nonzero.</td><td>One step into an obstacle writes about \(-500\) into that pair. With no random retries, that action stays poisoned and a whole corridor can be abandoned.</td></tr>
+        <tr><td>0.1</td><td>Mostly improve the best known path. Occasionally try something else.</td><td>This is the usual balance. Look at whether the arrows reach \((5,8)\) and skirt the black cells, and at how many episodes that took.</td></tr>
+        <tr><td>0.5</td><td>Explore as often as you exploit.</td><td>Learns, but spends half its steps off the path it is trying to improve. Often needs more episodes than 0.1 to look clean.</td></tr>
+        <tr><td>1</td><td>Every step is uniform random. The Q update is still off-policy, so this is correct in the limit.</td><td>Random walks on a 10×10 with \(-500\) holes die before \(+100\) backs up across the map. Fifty thousand episodes is often not the limit.</td></tr>
+      </tbody>
+    </table>
+    <div class="hints" data-hints="p2c">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>What to write.</strong> Two observations from your own plots, not a generic definition. For the first question: as \(\varepsilon\) grows, the learned arrows go from “stuck with whatever was tried first” to “a path into the goal” and then back to “no coherent path yet, because the data is too diffuse.” For the second: pick a value you actually ran, say how many episodes it needed before the arrows stopped changing, and say what fails one step to either side (too little retrying, or too little use of what you have learned).
+      </div>
+    </div>
+  </section>
+
+  <section id="p3a">
+    <h2>3A · A tree where the exploration bonus wins</h2>
+    <p class="kicker">5 points · Lecture 14, exploration functions · the notebook invites an LLM here</p>
+    <p class="sig">build_exploration_mdp() → (mdp, start)</p>
+    <p>You are not implementing either agent. The grader trains both, from the same start every episode, for 500 episodes, at most 50 steps, with \(\alpha = 0.1\), \(\varepsilon = 0.1\), \(k = 1\), \(p = 0.8\), \(\gamma = 0.95\). A policy is near-optimal when its true value at the start is at least \(0.9\) times \(V^*(\text{start})\). You need the bonus agent to clear that bar on at least 8 of 10 seeds, and ε-greedy on at most 2.</p>
+    <h3>The bonus, exactly as specified</h3>
+    <div class="eq">\[ f(u, n) = u + \frac{k}{n+1} \]</div>
+    <div class="eq">\[
+      Q(s,a) \leftarrow (1-\alpha)\, Q(s,a) + \alpha \Big[ r + \gamma \max_{a'} f\big(Q(s', a'),\, N(s', a')\big) \Big]
+    \]</div>
+    <p>The agent always acts by \(\arg\max_a f(Q(s,a), N(s,a))\). \(N(s,a)\) is how many times that pair has been tried. Untried pairs get a finite bonus of \(k\), here \(1\), instead of infinity.</p>
+    <h3>Why this MDP makes the bonus matter</h3>
+    <p><code>build_graph_mdp</code> turns <em>every edge</em> into an action, at every state. An edge that does not touch the current state leaves you there for sure, with reward 0. An edge that does touch it moves you to the other end with probability \(p\) and leaves you put with probability \(1-p\). The only nonzero reward is \(+100\), received on the transition that arrives at the goal. The goal is a sink. The graph has to be a tree: connected, \(|E| = |S| - 1\), at most 16 nodes. <code>networkx.is_tree</code> is the check.</p>
+    <p>Until someone reaches the goal, every true reward is 0, so ordinary Q-learning has \(\max_{a'} Q(s', a') = 0\) everywhere. ε-greedy then has nothing to exploit. Its “greedy” action is a random tie, so it is basically jogging in place: from a node of a long path, only one of the many edges actually moves you forward.</p>
+    <p>The exploration update bootstraps \(f\), not \(Q\). A successor whose actions are still untried has \(\max f = k\). A successor you have already fiddled with has a smaller bonus. So an edge that steps into fresh territory gets a higher target than a no-op, <em>before any real reward</em>. The agent is pulled down an unvisited corridor. Once the \(+100\) shows up it swamps \(k = 1\), the bonus stops mattering, and the greedy policy is just “walk to the goal.”</p>
+    <div class="widget" id="explore-widget">
+      <h3 style="margin-top:0">Miniature corridor, 40 episodes</h3>
+      <p class="plain">Nine nodes in a line, goal at the right end. This is short enough that both ideas are visible. It is not a graph that meets the 8-of-10 / 2-of-10 bar. Color is visit count. The number under each row is the first episode that entered the goal.</p>
+      <div class="row">
+        <button type="button" id="explore-run">Run seed 0</button>
+        <button type="button" class="ghost" id="explore-reroll">New seed</button>
+      </div>
+      <p style="margin-bottom:0.15rem">Exploration function</p>
+      <div class="corridor" id="explore-expl"></div>
+      <p class="plain" id="explore-expl-cap"></p>
+      <p style="margin-bottom:0.15rem">ε-greedy</p>
+      <div class="corridor" id="explore-eps"></div>
+      <p class="plain" id="explore-eps-cap"></p>
+    </div>
+    <div class="hints" data-hints="p3a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — the knob is the length of the unique corridor.</strong> Side branches are a weaker lever than they look: a short path is easy for a random walker to luck into, leaves and all. What collapses ε-greedy is a single chain of correct edges long enough that “pick one action out of \(|E|\)” almost never completes it inside 50 steps, repeated over only 500 episodes. Position resets to <code>start</code> every episode. \(N\) and \(Q\) do not, which is why the bonus agent keeps making progress.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — the two failure directions.</strong> The test cell prints how many seeds were near-optimal. If ε-greedy is also succeeding, the goal is too easy to stumble into: lengthen the corridor. If the exploration agent is also failing, the chain is too long to finish and back up inside 50 steps and 500 episodes: shorten it. \(p = 0.8\) means even the right edge fails one time in five, so expected steps along a corridor of length \(L\) are about \(L / 0.8\), and that has to fit in 50. Keep the start off the goal.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3 — a legal skeleton.</strong> Build an undirected <code>networkx</code> path, optionally hang structure off it, assert <code>nx.is_tree(G)</code> and <code>G.number_of_nodes() &lt;= 16</code>, then
+        <pre>mdp = build_graph_mdp(G, goal, p=0.8, gamma=0.95)
+return mdp, start</pre>
+        Put the graph construction in a helper. Part 3B has to draw the same graph, and <code>build_exploration_mdp</code> is specified to return only <code>(mdp, start)</code>.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="Before the goal is found, every stored Q is about 0. The bonus inside the max is then the only difference between actions. An edge into a state with untried actions has a larger bootstrapped target than an edge that stays among actions you have already tried. ε-greedy has no such term, so it keeps sampling uniformly.">
+      <legend>Check: before anyone has reached the goal, why does the bonus agent still prefer some edges?</legend>
+      <label><input type="radio" name="q3a" value="a"> Because \(k\) is added to the goal reward only</label>
+      <label><input type="radio" name="q3a" value="b"> Because the update bootstraps \(\max f\), so a step toward untried actions scores higher than a no-op even though every real reward so far is 0</label>
+      <label><input type="radio" name="q3a" value="c"> Because it sets \(\varepsilon = 1\)</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <section id="p3b">
+    <h2>3B · Show why that happened</h2>
+    <p class="kicker">5 points · one figure that makes the argument</p>
+    <p>Running the 3A test writes <code>exploration_traces.pkl</code> next to the notebook. Load it and draw the comparison. The grader is convinced by the seed counts; this part is for a reader who has not seen the tree.</p>
+    <pre>import pickle
+with open("exploration_traces.pkl", "rb") as f:
+    traces = pickle.load(f)</pre>
+    <table>
+      <thead><tr><th>Key</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td><code>start</code>, <code>goal</code>, <code>V_star_start</code></td><td>Where value is measured, and the exact optimal value there</td></tr>
+        <tr><td><code>params</code></td><td>\(\alpha, \varepsilon, k\), episode cap, step cap</td></tr>
+        <tr><td><code>epsilon_greedy</code>, <code>exploration_function</code></td><td>A list, one dict per seed</td></tr>
+        <tr><td><code>episodes</code></td><td>Each training episode, as <code>(state, action, next_state, reward)</code> tuples</td></tr>
+        <tr><td><code>policy</code></td><td>Greedy policy at the end of that seed</td></tr>
+        <tr><td><code>value_history</code></td><td><code>(episode, V^π(start))</code> every 10 episodes</td></tr>
+        <tr><td><code>near_optimal</code></td><td>Whether that seed cleared \(0.9 V^*\)</td></tr>
+      </tbody>
+    </table>
+    <p>A figure that actually argues has three beats, in this order:</p>
+    <ol>
+      <li><strong>The corridor.</strong> Draw your tree, mark start and goal. The reader should see one chain of edges that moves you, and a pile of actions that do not.</li>
+      <li><strong>Where the time went.</strong> Color nodes by how often each agent’s <code>episodes</code> occupy them, summed over seeds. The bonus agent should be dark along the chain. ε-greedy should be dark on the start and a few accidental neighbors.</li>
+      <li><strong>When the value appears.</strong> Plot every seed’s <code>value_history</code> against a horizontal line at <code>V_star_start</code>. Mark the episode on which each seed first has <code>next_state == goal</code>. The bonus curves jump and sit near \(V^*\). The ε-greedy curves stay near 0.</li>
+    </ol>
+    <div class="hints" data-hints="p3b">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1 — first arrival.</strong>
+        <pre>def first_goal(episodes, goal):
+    for i, episode in enumerate(episodes):
+        for s, a, s2, r in episode:
+            if s2 == goal:
+                return i
+    return None</pre>
+        Average that index over the 10 seeds, or draw all 10 as dots. “Exploration arrived; ε-greedy did not” is the sentence the middle of the figure is for.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2 — visits need the graph, not the MDP.</strong> The pickle has no node positions. Rebuild the same graph you passed to <code>build_graph_mdp</code> (the helper from 3A), lay it out with <code>nx.spring_layout</code> or, for a path, by hand, and size or color nodes by visit counts parsed out of <code>episodes</code>. Count the <code>state</code> field. A caption under the panels should say the mechanism in one line: random actions rarely complete the chain, and the bonus walks toward untried successors until \(+100\) takes over.
+      </div>
+    </div>
+  </section>
+
+  <section class="shared" id="part4">
+    <h2>Part 4</h2>
+    <p>The 5 points are the time-spent form linked in the notebook. The confirmation word it shows you goes in <code>form_confirmation_word</code>. Nothing on the slides helps with that cell.</p>
+    <p class="plain">Open this file beside the notebook and reveal hints only after you have tried the update on one tuple by hand. The widgets are the lecture examples, scaled down. They are not the graded numbers.</p>
+  </section>
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      throwOnError: false
+    });
+  }
+  setupHints();
+  setupChecks();
+  setupReturns();
+  setupTD();
+  setupQ();
+  setupExplore();
+});
+
+function setupHints() {
+  const store = JSON.parse(localStorage.getItem("ps7-guide-hints") || "{}");
+  document.querySelectorAll(".hints").forEach((box) => {
+    const id = box.dataset.hints;
+    const hints = [...box.querySelectorAll(".hint")];
+    const next = box.querySelector(".hint-next");
+    const reset = box.querySelector(".hint-reset");
+    const count = box.querySelector(".hint-count");
+    let shown = Math.min(store[id] || 0, hints.length);
+    const paint = () => {
+      hints.forEach((h, i) => { h.hidden = i >= shown; });
+      count.textContent = shown === 0 ? "" : `Showing ${shown} of ${hints.length}`;
+      next.hidden = shown >= hints.length;
+      next.textContent = shown === 0 ? "Reveal a hint" : "Reveal the next hint";
+      store[id] = shown;
+      localStorage.setItem("ps7-guide-hints", JSON.stringify(store));
+    };
+    next.addEventListener("click", () => { shown = Math.min(hints.length, shown + 1); paint(); });
+    reset.addEventListener("click", () => { shown = 0; paint(); });
+    paint();
+  });
+}
+
+function setupChecks() {
+  document.querySelectorAll("fieldset.check").forEach((box) => {
+    const button = box.querySelector("button");
+    const feedback = box.querySelector(".feedback");
+    button.addEventListener("click", () => {
+      const picked = box.querySelector("input:checked");
+      feedback.hidden = false;
+      if (!picked) {
+        feedback.className = "feedback bad";
+        feedback.textContent = "Pick one first.";
+        return;
+      }
+      const ok = picked.value === box.dataset.answer;
+      feedback.className = ok ? "feedback good" : "feedback bad";
+      feedback.textContent = (ok ? "Yes. " : "Not quite. ") + box.dataset.explain;
+    });
+  });
+}
+
+function returnsFrom(rewards, gamma) {
+  const G = Array(rewards.length);
+  let g = 0;
+  for (let i = rewards.length - 1; i >= 0; i--) {
+    g = rewards[i] + gamma * g;
+    G[i] = g;
+  }
+  return G;
+}
+
+function setupReturns() {
+  const episodes = {
+    short: {
+      states: ["(1,1)", "(2,1)"],
+      next: ["(2,1)", "(2,2) goal"],
+      rewards: [0, 100]
+    },
+    revisit: {
+      states: ["(2,1)", "(2,0)", "(2,1)"],
+      next: ["(2,0)", "(2,1)", "(2,2) goal"],
+      rewards: [0, 0, 100]
+    }
+  };
+  const gamma = document.getElementById("ret-gamma");
+  const gammaOut = document.getElementById("ret-gamma-out");
+  const which = document.getElementById("ret-episode");
+  const table = document.getElementById("ret-table");
+  const summary = document.getElementById("ret-summary");
+  const paint = () => {
+    const g = Number(gamma.value);
+    gammaOut.textContent = g.toFixed(2);
+    const ep = episodes[which.value];
+    const G = returnsFrom(ep.rewards, g);
+    const seen = new Set();
+    const rows = ep.states.map((s, i) => {
+      const first = !seen.has(s);
+      seen.add(s);
+      return `<tr><td>${s}</td><td>${ep.next[i]}</td><td>${ep.rewards[i]}</td><td>${G[i].toFixed(2)}</td><td>${first ? "record" : "skip"}</td></tr>`;
+    });
+    table.innerHTML = `<thead><tr><th>state</th><th>next</th><th>r</th><th>G from here</th><th>first visit</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+    const kept = [];
+    const seen2 = new Set();
+    ep.states.forEach((s, i) => {
+      if (seen2.has(s)) return;
+      seen2.add(s);
+      kept.push(`${s} → ${G[i].toFixed(2)}`);
+    });
+    summary.textContent = "Samples you would keep from this single episode: " + kept.join(", ") + ". The goal never starts a tuple here, so it contributes no sample.";
+  };
+  gamma.addEventListener("input", paint);
+  which.addEventListener("change", paint);
+  paint();
+}
+
+function setupTD() {
+  const gamma = document.getElementById("td-gamma");
+  const alpha = document.getElementById("td-alpha");
+  const table = document.getElementById("td-table");
+  const transitions = [
+    { s: "(1,1)", sp: "(2,1)", r: 0 },
+    { s: "(2,1)", sp: "(2,2)", r: 100 }
+  ];
+  const paint = () => {
+    const g = Number(gamma.value);
+    const a = Number(alpha.value);
+    document.getElementById("td-gamma-out").textContent = g.toFixed(2);
+    document.getElementById("td-alpha-out").textContent = a.toFixed(2);
+    const V = {};
+    const rows = transitions.map((tr) => {
+      const old = V[tr.s] || 0;
+      const next = V[tr.sp] || 0;
+      const target = tr.r + g * next;
+      const updated = (1 - a) * old + a * target;
+      V[tr.s] = updated;
+      return `<tr><td>${tr.s}</td><td>${tr.sp}</td><td>${tr.r}</td><td>${next.toFixed(2)}</td><td>${target.toFixed(2)}</td><td>${old.toFixed(2)} → ${updated.toFixed(2)}</td></tr>`;
+    });
+    table.innerHTML = `<thead><tr><th>s</th><th>s'</th><th>r</th><th>V(s') before</th><th>target</th><th>V(s)</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+  };
+  gamma.addEventListener("input", paint);
+  alpha.addEventListener("input", paint);
+  paint();
+}
+
+function setupQ() {
+  const ids = ["q-alpha", "q-gamma", "q-old", "q-r", "q-max"];
+  const paint = () => {
+    const a = Number(document.getElementById("q-alpha").value);
+    const g = Number(document.getElementById("q-gamma").value);
+    const old = Number(document.getElementById("q-old").value);
+    const r = Number(document.getElementById("q-r").value);
+    const maxNext = Number(document.getElementById("q-max").value);
+    document.getElementById("q-alpha-out").textContent = a.toFixed(2);
+    document.getElementById("q-gamma-out").textContent = g.toFixed(2);
+    const target = r + g * maxNext;
+    const updated = (1 - a) * old + a * target;
+    document.getElementById("q-out").innerHTML =
+      `Target = ${r} + ${g.toFixed(2)} × ${maxNext} = <strong>${target.toFixed(2)}</strong>. ` +
+      `New Q = (1 − ${a.toFixed(2)}) × ${old} + ${a.toFixed(2)} × ${target.toFixed(2)} = <strong>${updated.toFixed(2)}</strong>.`;
+  };
+  ids.forEach((id) => document.getElementById(id).addEventListener("input", paint));
+  paint();
+}
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function setupExplore() {
+  const DEPTH = 8;
+  const EDGES = Array.from({ length: DEPTH }, (_, i) => [i, i + 1]);
+  const ACTIONS = EDGES;
+  let seed = 0;
+
+  function run(kind, rng) {
+    const states = Array.from({ length: DEPTH + 1 }, (_, i) => i);
+    const Q = {};
+    const N = {};
+    states.forEach((s) => {
+      Q[s] = ACTIONS.map(() => 0);
+      N[s] = ACTIONS.map(() => 0);
+    });
+    const visits = states.map(() => 0);
+    const alpha = 0.1, gamma = 0.95, eps = 0.1, k = 1, p = 0.8;
+    const goal = DEPTH;
+    const f = (u, n) => u + k / (n + 1);
+    const argmax = (scores) => {
+      let best = -Infinity;
+      const cands = [];
+      scores.forEach((v, i) => {
+        if (v > best + 1e-12) { best = v; cands.length = 0; cands.push(i); }
+        else if (Math.abs(v - best) <= 1e-12) cands.push(i);
+      });
+      return cands[Math.floor(rng() * cands.length)];
+    };
+    let first = null;
+    for (let ep = 0; ep < 40; ep++) {
+      let s = 0;
+      for (let step = 0; step < 40 && s !== goal; step++) {
+        visits[s] += 1;
+        let ai;
+        if (kind === "eps") {
+          if (rng() < eps) ai = Math.floor(rng() * ACTIONS.length);
+          else ai = argmax(Q[s]);
+        } else {
+          ai = argmax(ACTIONS.map((_, i) => f(Q[s][i], N[s][i])));
+        }
+        const [u, v] = ACTIONS[ai];
+        let sp = s, r = 0;
+        if (s === u || s === v) {
+          const dest = s === u ? v : u;
+          if (rng() < p) {
+            sp = dest;
+            r = dest === goal ? 100 : 0;
+          }
+        }
+        const bootstrap = sp === goal ? 0 : (kind === "eps"
+          ? Math.max(...Q[sp])
+          : Math.max(...ACTIONS.map((_, i) => f(Q[sp][i], N[sp][i]))));
+        const target = r + gamma * bootstrap;
+        Q[s][ai] = (1 - alpha) * Q[s][ai] + alpha * target;
+        N[s][ai] += 1;
+        s = sp;
+      }
+      if (s === goal && first === null) first = ep;
+      if (s === goal) visits[s] += 1;
+    }
+    return { visits, first };
+  }
+
+  function paintRow(el, visits) {
+    const max = Math.max(...visits, 1);
+    el.innerHTML = visits.map((v, i) => {
+      const t = v / max;
+      const ink = t > 0.55 ? "#f6efe2" : "#1d1a16";
+      const bg = i === visits.length - 1
+        ? `rgb(${30 + Math.round(80 * (1 - t))}, ${90 + Math.round(60 * t)}, ${50})`
+        : `rgb(${80 + Math.round(120 * (1 - t))}, ${40 + Math.round(20 * (1 - t))}, ${36})`;
+      const label = i === visits.length - 1 ? "G" : String(i);
+      return `<span style="background:${bg};color:${ink}" title="${v} visits">${label}</span>`;
+    }).join("");
+  }
+
+  const go = (nextSeed) => {
+    seed = nextSeed;
+    const expl = run("expl", mulberry32(seed + 1));
+    const eps = run("eps", mulberry32(seed + 99));
+    paintRow(document.getElementById("explore-expl"), expl.visits);
+    paintRow(document.getElementById("explore-eps"), eps.visits);
+    const say = (result) => result.first === null
+      ? "Did not reach the goal in 40 episodes."
+      : `First reached the goal on episode ${result.first}.`;
+    document.getElementById("explore-expl-cap").textContent = say(expl) + " Seed " + seed + ".";
+    document.getElementById("explore-eps-cap").textContent = say(eps);
+  };
+
+  document.getElementById("explore-run").addEventListener("click", () => go(0));
+  document.getElementById("explore-reroll").addEventListener("click", () => go((Math.random() * 10000) | 0));
+  go(0);
+}
+</script>
+</body>
+</html>
