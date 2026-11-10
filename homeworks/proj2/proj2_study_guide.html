@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project 2 study guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,460;8..60,600&family=Source+Sans+3:wght@420;560;680&family=Source+Code+Pro:wght@450;560&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3efe4;
+    --sheet: #faf7f0;
+    --ink: #1d1a16;
+    --muted: #5e574c;
+    --line: #ddd4c3;
+    --oxblood: #7d2a2a;
+    --oxblood-soft: #f3e4dc;
+    --pine: #1e5c45;
+    --pine-soft: #e4f0ea;
+    --gold: #8a5a12;
+    --gold-soft: #f8efd8;
+    --slate: #34506b;
+    --slate-soft: #e3eaf1;
+    --code: #241f1b;
+    --code-ink: #f6efe2;
+    --eqbg: #efe8d8;
+    --widget: #fffdf8;
+    --cell: #ffffff;
+    --shadow: 0 1px 0 rgba(29, 26, 22, 0.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgba(125, 42, 42, 0.08), transparent 50%),
+      var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(243, 239, 228, 0.93);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner, main { width: min(54rem, calc(100% - 2rem)); margin: 0 auto; }
+  .eyebrow {
+    margin: 0.85rem 0 0.15rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    font-weight: 680;
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.85rem;
+    line-height: 1.15;
+    margin: 0 0 0.7rem;
+  }
+  nav.jumps { display: flex; gap: 0.35rem; flex-wrap: wrap; padding-bottom: 0.75rem; }
+  nav.jumps a {
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--sheet);
+    border-radius: 999px;
+    padding: 0.12rem 0.6rem;
+    font-size: 0.84rem;
+  }
+  nav.jumps a.concept-link { border-style: dashed; }
+  nav.jumps a:hover, nav.jumps a:focus-visible { border-color: var(--oxblood); color: var(--oxblood); }
+  main { padding: 1.4rem 0 4rem; }
+  section {
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--oxblood);
+    box-shadow: var(--shadow);
+    padding: 1.15rem 1.3rem 1.3rem;
+    margin: 0 0 1rem;
+    scroll-margin-top: 8rem;
+  }
+  section.shared { border-left-color: var(--pine); }
+  section.concept { border-left-color: var(--slate); }
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 680;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    margin-bottom: 0.35rem;
+  }
+  .tag.c { background: var(--slate-soft); color: var(--slate); }
+  .tag.p { background: var(--oxblood-soft); color: var(--oxblood); }
+  .tag.s { background: var(--pine-soft); color: var(--pine); }
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+  }
+  h3 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.12rem;
+    margin: 1.2rem 0 0.35rem;
+  }
+  p { margin: 0.5rem 0; }
+  .kicker { color: var(--muted); font-size: 0.92rem; margin: 0 0 0.6rem; }
+  .eq {
+    background: var(--eqbg);
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+    overflow-x: auto;
+  }
+  .plain { color: var(--muted); font-size: 0.95rem; }
+  code, .mono { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.86em; }
+  pre {
+    background: var(--code);
+    color: var(--code-ink);
+    padding: 0.8rem 0.95rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.45;
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.82rem;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 0.6rem 0 0.2rem; font-size: 0.95rem; }
+  .table-wrap { overflow-x: auto; }
+  th, td { text-align: left; padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 680; }
+  .note, .hint, .feedback, .why, .pitfall, .warn {
+    border-radius: 6px;
+    padding: 0.65rem 0.85rem;
+    margin: 0.6rem 0;
+  }
+  .note { background: var(--pine-soft); }
+  .why { background: var(--slate-soft); }
+  .why > strong:first-child, .pitfall > strong:first-child, .warn > strong:first-child { display: block; margin-bottom: 0.15rem; }
+  .pitfall { background: var(--oxblood-soft); }
+  .warn { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .hint { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .hint[hidden] { display: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; margin: 0.45rem 0; }
+  button {
+    font: inherit;
+    background: var(--ink);
+    color: var(--sheet);
+    border: 0;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+  }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button:hover { background: var(--oxblood); }
+  button.ghost:hover { background: var(--oxblood-soft); color: var(--oxblood); }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--oxblood); outline-offset: 2px; }
+  select, input[type="number"] { font: inherit; font-size: 0.95rem; padding: 0.1rem 0.3rem; border: 1px solid var(--line); border-radius: 4px; background: var(--cell); color: var(--ink); }
+  label.slider { display: flex; gap: 0.5rem; align-items: center; font-size: 0.95rem; }
+  input[type="range"] { width: 9rem; accent-color: var(--oxblood); }
+  output { font-variant-numeric: tabular-nums; min-width: 2.6rem; display: inline-block; }
+  .widget {
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 0.8rem 0.9rem;
+    margin: 0.8rem 0;
+    background: var(--widget);
+  }
+  .widget h3 { margin-top: 0; }
+  .trace { width: 100%; font-variant-numeric: tabular-nums; }
+  .trace td.num, .trace th.num { text-align: right; }
+  fieldset.check {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 0.9rem 0 0.2rem;
+    padding: 0.7rem 0.9rem 0.85rem;
+  }
+  fieldset.check legend { font-weight: 680; padding: 0 0.3rem; }
+  fieldset.check label { display: block; margin: 0.28rem 0; cursor: pointer; }
+  .feedback.good { background: var(--pine-soft); }
+  .feedback.bad { background: var(--oxblood-soft); }
+  .muted { color: var(--muted); }
+  ul, ol { margin: 0.35rem 0 0.35rem 1.2rem; padding: 0; }
+  li { margin: 0.25rem 0; }
+  .sig {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.82rem;
+    background: var(--eqbg);
+    padding: 0.45rem 0.6rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  .flow { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: stretch; margin: 0.7rem 0; }
+  .flow div {
+    flex: 1 1 9rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.5rem 0.6rem;
+    background: var(--widget);
+    font-size: 0.92rem;
+  }
+  .flow div b { display: block; font-family: "Source Serif 4", Georgia, serif; font-size: 1rem; margin-bottom: 0.1rem; }
+  .flow div span.part { color: var(--oxblood); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 680; }
+
+  /* grids */
+  .grids { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; }
+  .gridbox p { margin: 0 0 0.3rem; font-size: 0.9rem; color: var(--muted); }
+  .board { display: grid; gap: 0; border: 2px solid var(--ink); width: max-content; }
+  .board .c {
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 1px solid #b9b0a0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.66rem;
+    line-height: 1.1;
+    background: var(--cell);
+    color: var(--ink);
+    position: relative;
+  }
+  .board .c .big { font-size: 0.85rem; font-weight: 560; }
+  .board .c .arrow { position: absolute; top: 1px; right: 3px; font-size: 0.7rem; color: var(--muted); }
+  .board .c.wb { border-bottom: 3px solid var(--ink); }
+  .board .c.wr { border-right: 3px solid var(--ink); }
+  .board .c.dead { background: repeating-linear-gradient(45deg, #e8e2d6, #e8e2d6 4px, #f3efe6 4px, #f3efe6 8px); }
+  .legend { font-size: 0.85rem; color: var(--muted); }
+  svg text { font-family: "Source Sans 3", sans-serif; }
+  .stat { font-variant-numeric: tabular-nums; }
+  .stat strong { font-size: 1.05rem; }
+  .pick { font-weight: 680; color: var(--pine); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <p class="eyebrow">16.413 / 6.4132 · Grad Project 2</p>
+    <h1>Project 2 study guide: search, fire, and MCTS</h1>
+    <nav class="jumps" aria-label="Sections">
+      <a href="#start">Start here</a>
+      <a href="#story">Big picture</a>
+      <a href="#codebase">Codebase</a>
+      <a class="concept-link" href="#c-search">Search</a>
+      <a href="#p1a">1A</a>
+      <a href="#p1b">1B</a>
+      <a class="concept-link" href="#c-fire">Fire model</a>
+      <a class="concept-link" href="#c-determinize">Determinize</a>
+      <a href="#p2a">2A</a>
+      <a href="#p2b">2B</a>
+      <a href="#p2c">2C</a>
+      <a href="#p2d">2D</a>
+      <a class="concept-link" href="#c-mcts">MCTS</a>
+      <a href="#p3a">3A</a>
+      <a href="#p3b">3B</a>
+      <a href="#p3c">3C</a>
+      <a href="#submit">Submit</a>
+    </nav>
+  </div>
+</header>
+<main>
+
+  <!-- ============================== START ============================== -->
+  <section class="shared" id="start">
+    <span class="tag s">Before you start</span>
+    <h2>Make sure the code actually runs</h2>
+    <p>Fix these first. Each one causes an error that has nothing to do with your solution.</p>
+    <div class="warn">
+      <strong>1. <code>fire_process.py</code> crashes on import with Python 3.11 or newer.</strong>
+      Your project venv uses Python 3.14. Newer Python versions don't allow a NumPy array as a dataclass field default, so <code>from fire_process import ...</code> fails with
+      <code>ValueError: mutable default &lt;class 'numpy.ndarray'&gt; for field fire_weights is not allowed</code>.
+      You only need to change one line in <code>FireProcess</code>:
+      <pre>fire_weights: np.ndarray = dataclasses.field(
+    default_factory=lambda: np.array([[0, 1, 0], [1, 4, 1], [0, 1, 0]]))</pre>
+      This keeps the same default values. Mention the change in your submission, since the instructions ask you to include any <code>.py</code> file you modify.
+    </div>
+    <div class="warn">
+      <strong>2. Some packages are missing.</strong> <code>utils.py</code> imports <code>scipy</code> and <code>matplotlib</code>, and <code>benchmark_agent</code> imports <code>tqdm</code>. None of these are in <code>pyproject.toml</code>. From the <code>proj2</code> folder, run:
+      <pre>uv add scipy matplotlib tqdm imageio-ffmpeg</pre>
+    </div>
+    <div class="warn">
+      <strong>3. Saving <code>.mp4</code> files needs ffmpeg.</strong> It isn't on your PATH. The <code>imageio-ffmpeg</code> package from step 2 includes a copy you can point matplotlib to:
+      <pre>import imageio_ffmpeg, matplotlib
+matplotlib.rcParams["animation.ffmpeg_path"] = imageio_ffmpeg.get_ffmpeg_exe()</pre>
+    </div>
+  </section>
+
+  <!-- ============================== STORY ============================== -->
+  <section class="shared" id="story">
+    <span class="tag s">Orientation</span>
+    <h2>The big picture</h2>
+    <p>The project starts with a simple problem and adds one difficulty at a time. Each part handles a difficulty the previous method couldn't.</p>
+    <div class="flow">
+      <div><span class="part">Part 1</span><b>Deterministic world</b>Walls, one-way doors, a patient, and a hospital. Nothing random. Planning is search, and a good heuristic makes it fast.</div>
+      <div><span class="part">Part 2</span><b>Add random fire</b>Fire spreads randomly over time. To keep using A*, we <em>determinize</em>: replace the randomness with "how likely is this cell to be on fire," and plan the safest path.</div>
+      <div><span class="part">Part 2D</span><b>Where it breaks</b>A determinized plan assumes you'll follow it no matter what you see later. It undervalues options like "go somewhere roomy, then dodge the fire as it moves."</div>
+      <div><span class="part">Part 3</span><b>MCTS</b>Plan by simulating futures with real sampled fire and learning which first action does best. Then compare all the agents.</div>
+    </div>
+    <p>Throughout, keep two questions in mind: <strong>what does this planner assume about the world</strong>, and <strong>what does that assumption cost</strong>? Your written answers (1B, 2D, 3C) should answer those questions.</p>
+
+    <h3>Coordinates (different from PS7)</h3>
+    <p>Locations are <code>(row, col)</code>. <strong>Row 0 is the top row.</strong> <code>"up"</code> means row − 1 and <code>"down"</code> means row + 1. Since this matches NumPy indexing, <code>state.fire_grid[state.robot_loc]</code> directly gives whether the robot's cell is on fire.</p>
+
+    <h3>Rewards in the fire problems</h3>
+    <table>
+      <thead><tr><th>Event</th><th>Reward</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Robot ends a step on a burning cell</td><td>−1</td><td>Episode ends.</td></tr>
+        <tr><td>Robot reaches the hospital carrying the patient</td><td>+1</td><td>Episode ends.</td></tr>
+        <tr><td>Any other step</td><td>0</td><td>Discount factor is 0.999 per step.</td></tr>
+      </tbody>
+    </table>
+    <p class="plain">So an episode's total reward is about +1 (rescued), about −1 (burned), or 0 (ran out of time, which only happens in <code>maze</code>, where the horizon is 20). Keep this in mind when you read the benchmark table in 3C.</p>
+  </section>
+
+  <!-- ============================== CODEBASE ============================== -->
+  <section class="shared" id="codebase">
+    <span class="tag s">Orientation</span>
+    <h2>Where things live in the code</h2>
+    <p>The notebook asks you to read the <code>.py</code> files. These are the parts you'll actually use.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>File</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>PathCostProblem</code></td><td>utils.py</td><td>Base class for deterministic search problems: <code>initial</code>, <code>actions</code>, <code>step</code>, <code>goal_test</code>, <code>step_cost</code>, and <code>h</code>. The default <code>h</code> <strong>always returns 0</strong>.</td></tr>
+        <tr><td><code>run_best_first_search(problem, get_priority, step_budget)</code></td><td>utils.py</td><td>A general best-first search. You pass a function that maps a node to its priority. Returns <code>(states, actions, costs, num_steps)</code>.</td></tr>
+        <tr><td><code>BFSNode</code></td><td>utils.py</td><td>A search node with fields <code>state</code>, <code>parent</code>, <code>action</code>, <code>cost</code>, and <code>g</code> (path cost so far).</td></tr>
+        <tr><td><code>PickupProblem</code>, <code>PickupProblemState</code></td><td>pickup_problem.py</td><td>The grid world. A state is <code>(robot_loc, carried_patient)</code>. You pick up the patient automatically by stepping onto their cell.</td></tr>
+        <tr><td><code>FireProcess</code></td><td>fire_process.py</td><td>The fire model. <code>dist(grid)</code> returns next-step fire probabilities (a convolution). <code>sample(grid)</code> draws a random next fire grid.</td></tr>
+        <tr><td><code>FireMDP</code>, <code>FireMDPState</code></td><td>fire_process.py</td><td>The full stochastic problem. A state is <code>(robot_loc, carried_patient, fire_grid)</code>.</td></tr>
+        <tr><td><code>get_problem(name)</code></td><td>fire_process.py</td><td>The four test environments: <code>maze</code>, <code>just_wait</code>, <code>the_circle</code>, <code>the_choice</code>.</td></tr>
+        <tr><td><code>run_mcts_search(...)</code></td><td>utils.py</td><td>A complete MCTS implementation that returns one action. 3A just wraps it.</td></tr>
+        <tr><td><code>RolloutLookaheadAgent</code></td><td>utils.py</td><td>A baseline agent for 3C.</td></tr>
+        <tr><td><code>run_agent_on_problem</code>, <code>animate_trajectory</code>, <code>benchmark_agent</code></td><td>utils.py</td><td>Run one episode, turn an episode into an animation, and run many episodes.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h3>The four environments</h3>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Size</th><th>What's special</th></tr></thead>
+      <tbody>
+        <tr><td><code>maze</code></td><td>5×4</td><td><strong>No fire at all</strong>, but the horizon is 20 steps. It only tests whether the agent can navigate in time.</td></tr>
+        <tr><td><code>just_wait</code></td><td>8×4</td><td>A one-way corridor runs down from the start, with fire next to it. Once you enter, you can't turn back, so it pays to wait first. Same layout as the Part 1 maze.</td></tr>
+        <tr><td><code>the_circle</code></td><td>5×4</td><td>The fire weights are center-only, so <strong>the fire never moves</strong>. This problem is effectively deterministic.</td></tr>
+        <tr><td><code>the_choice</code></td><td>9×6</td><td>Choose between a short one-way corridor near fire and a large room with more fire but room to dodge. The main problem for 2D and 3B.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ============================== CONCEPT: SEARCH ============================== -->
+  <section class="concept" id="c-search">
+    <span class="tag c">Concept</span>
+    <h2>Best-first search: one algorithm, three behaviors</h2>
+    <p>Uniform-cost search, greedy best-first search, and A* are the same algorithm with different priority functions. All three keep a <em>frontier</em> of discovered but unexpanded nodes in a priority queue. Each round, they pop the lowest-priority node, stop if it's a goal, and otherwise generate its children and push them.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Algorithm</th><th>Priority of node n</th><th>What it optimizes</th><th>Optimal?</th></tr></thead>
+      <tbody>
+        <tr><td>Uniform-cost search (UCS)</td><td><code>g(n)</code></td><td>Cheapest so far. Expands in rings of equal cost, like ripples.</td><td>Yes, but slow.</td></tr>
+        <tr><td>Greedy best-first</td><td><code>h(n)</code></td><td>Looks closest to the goal. Ignores how far it has already traveled.</td><td>No.</td></tr>
+        <tr><td>A*</td><td><code>g(n) + h(n)</code></td><td>Estimated total cost of the cheapest path through n.</td><td>Yes, if <code>h</code> is admissible.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><code>g(n)</code> is the actual cost from the start to <code>n</code>. <code>h(n)</code> is a <em>guess</em> of the remaining cost from <code>n</code> to a goal. A* adds them to estimate the full cost of the best path that goes through <code>n</code>, and always expands the node with the lowest estimate.</p>
+    <h3>Admissible and consistent heuristics</h3>
+    <ul>
+      <li><strong>Admissible:</strong> <code>h(n) ≤ h*(n)</code>, where <code>h*</code> is the true cheapest remaining cost. The heuristic is never too pessimistic. This guarantees A* never pops a goal by a suboptimal path while a better one is still in the frontier.</li>
+      <li><strong>Consistent:</strong> <code>h(n) ≤ cost(n, n') + h(n')</code> for each step. This is a triangle inequality: one step can't reduce the estimate by more than it costs. Consistent heuristics are also admissible. Manhattan distance on a grid with unit costs is consistent.</li>
+      <li><strong>Dominance:</strong> If two heuristics are both admissible and <code>h₂(n) ≥ h₁(n)</code> everywhere, then A* with <code>h₂</code> never expands more nodes than with <code>h₁</code>. Larger is better, as long as it stays admissible.</li>
+    </ul>
+    <div class="why">
+      <strong>Why heuristics speed things up</strong>
+      With <code>h = 0</code>, A* is UCS. It has no sense of direction and explores evenly in every direction until the cheapest path's cost is reached. A good heuristic adds a "this way" bias. Nodes leading away from the goal get high <code>g + h</code> and stay in the queue. The closer <code>h</code> is to <code>h*</code>, the more nodes are skipped. With <code>h = h*</code>, A* only expands nodes on an optimal path.
+    </div>
+    <h3>Details of this implementation</h3>
+    <ul>
+      <li><strong>The returned <code>num_steps</code> counts calls to <code>problem.step</code></strong>, meaning children generated, not nodes popped. This is the number 1A prints and the natural metric for 1B.</li>
+      <li>Ties are broken by the state (the heap stores <code>(priority, state, node)</code>), so runs are deterministic. The notebook relies on this for grading.</li>
+      <li>The goal test happens when a node is <em>popped</em>, not when it's generated. This is what makes A* optimal: a goal may be generated through an expensive path before the cheap path is found.</li>
+      <li>A child is added if it's new, or if it was reached before by a more expensive path.</li>
+    </ul>
+  </section>
+
+  <!-- ============================== 1A ============================== -->
+  <section id="p1a">
+    <span class="tag p">Part 1 · 5 points</span>
+    <h2>1A · A* with the default heuristic</h2>
+    <p class="kicker">Reference solution: 2 lines</p>
+    <p class="sig">run_astar_search(problem, step_budget=10000) → (states, actions, costs, num_steps)</p>
+    <p>You're writing the priority function for A* and passing it to <code>run_best_first_search</code>. The priority is <code>g + h</code>: <code>g</code> is <code>node.g</code>, and <code>h</code> is the problem's own heuristic applied to the node's state.</p>
+    <div class="eq">priority(node) = node.g + problem.h(node.state)</div>
+    <p><strong>Why use <code>problem.h</code> instead of hard-coding a heuristic?</strong> In Part 2, the agent calls this same <code>run_astar_search</code> on a <code>DeterminizedFireMDP</code>, which defines its own <code>h</code>. Calling <code>problem.h</code> lets one A* function work with any problem's heuristic.</p>
+    <p>For <code>SimpleProblem</code>, the default <code>h</code> returns 0, so this A* behaves exactly like uniform-cost search. That's intended: it's the baseline you'll beat in 1B.</p>
+
+    <div class="widget" id="astar-widget">
+      <h3>Try it: A* on the Part 1 maze</h3>
+      <p class="plain">This runs the same algorithm as <code>run_best_first_search</code>, with the same tie-breaking, on <code>SimpleProblem</code>. Each cell shows how many times a node at that location was <em>expanded</em> (popped and its children generated). States with and without the patient are counted together. Thick lines are two-way walls. Small arrows mark one-way corridors. Hatched cells can't be reached.</p>
+      <div class="row">
+        <label class="slider">Heuristic
+          <select id="astar-h">
+            <option value="zero">h = 0 (default, as in 1A)</option>
+            <option value="patient">Manhattan to the next target only</option>
+            <option value="two">Manhattan, two legs (robot → patient → hospital)</option>
+            <option value="double">2 × two-leg Manhattan (not admissible)</option>
+          </select>
+        </label>
+      </div>
+      <div class="grids">
+        <div class="gridbox"><div class="board" id="astar-board"></div></div>
+        <div class="stat" id="astar-stats" style="flex:1 1 14rem"></div>
+      </div>
+    </div>
+
+    <div class="hints" data-hints="p1a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1: what <code>get_priority</code> receives.</strong> It gets a whole <code>BFSNode</code>, not a state. The path cost is <code>node.g</code> and the state is <code>node.state</code>. A lambda is enough.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2: the full answer.</strong>
+        <pre>def run_astar_search(problem, step_budget=10000):
+    return run_best_first_search(
+        problem, lambda n: n.g + problem.h(n.state), step_budget)</pre>
+        Don't pass in a heuristic of your own here. Pass <code>step_budget</code> through, because the Part 2 agent passes its own value.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="c" data-explain="With h = 0 the priority is g, which is exactly uniform-cost search. It is still optimal, just slow, because nothing points it toward the goal.">
+      <legend>Check: with the default heuristic, A* on SimpleProblem behaves like…</legend>
+      <label><input type="radio" name="q1a" value="a"> Greedy best-first search</label>
+      <label><input type="radio" name="q1a" value="b"> Depth-first search</label>
+      <label><input type="radio" name="q1a" value="c"> Uniform-cost search</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <!-- ============================== 1B ============================== -->
+  <section id="p1b">
+    <span class="tag p">Part 1 · 10 points</span>
+    <h2>1B · A better heuristic</h2>
+    <p class="kicker">Code + written answer · reference heuristic: 12 lines</p>
+    <p class="sig">run_astar_search_faster(problem, step_budget=10000) → (states, actions, costs, num_steps)</p>
+    <h3>How to design one: relax the problem</h3>
+    <p>The standard way to get an admissible heuristic is to <strong>solve an easier version of the problem exactly</strong>. Remove a constraint, and the optimal cost of the easier problem can't be higher than the real one. Removing constraints never makes the trip longer.</p>
+    <p>Here, remove the walls and one-way doors. The robot must still (1) reach the patient and (2) take them to the hospital. Without walls, each leg is the Manhattan distance:</p>
+    <div class="eq">
+      If not carrying the patient: h = |robot − patient|₁ + |patient − hospital|₁<br>
+      If carrying the patient: h = |robot − hospital|₁
+    </div>
+    <p><code>|a − b|₁</code> means <code>|a.row − b.row| + |a.col − b.col|</code>. Every step costs exactly 1, and the walls only remove options. So the true cost is at least this value, and the heuristic is admissible.</p>
+    <div class="why">
+      <strong>Why both legs?</strong>
+      "Manhattan distance to the hospital" alone is admissible but weak: it ignores the detour to the patient, and in this maze the patient is in the opposite direction from the hospital. "Manhattan to the patient only" ignores the return trip. The two-leg version is the largest of these and still admissible, so by dominance it expands the fewest nodes. You can compare these choices in the widget in 1A.
+    </div>
+    <h3>Implementation shape</h3>
+    <p>You can't easily override <code>SimpleProblem.h</code> because the problem is a frozen dataclass. You don't need to: write a heuristic function inside <code>run_astar_search_faster</code> that reads <code>problem.patient_loc</code> and <code>problem.hospital_loc</code>, and use it in the priority lambda.</p>
+
+    <h3>What "outperforms" should mean in your answer</h3>
+    <p>The notebook leaves this open. A good answer measures <strong>two things</strong>:</p>
+    <ol>
+      <li><strong>Work:</strong> compare <code>num_steps</code> (calls to <code>problem.step</code>) for the old and new heuristics. You could also time both, but step counts are deterministic and easier to compare.</li>
+      <li><strong>Quality:</strong> show that the total path cost is unchanged. A faster search that returns a worse path isn't better. This is what admissibility guarantees, and you should show it, not just claim it.</li>
+    </ol>
+    <p>The widget in 1A runs the same algorithm, so its numbers should match yours. If your <code>num_steps</code> disagrees, check the tie-breaking and the carrying case.</p>
+
+    <div class="hints" data-hints="p1b">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1: don't forget the carrying case.</strong> After pickup, the robot is standing where the patient was, but <code>problem.patient_loc</code> still holds the patient's <em>original</em> location. If you always use the two-leg formula, you'll count a leg the robot has already traveled, and the heuristic can overestimate after pickup. Check <code>state.carried_patient</code>.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2: code skeleton.</strong>
+        <pre>def run_astar_search_faster(problem, step_budget=10000):
+    def manhattan(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    def h(state):
+        if state.carried_patient:
+            return manhattan(state.robot_loc, problem.hospital_loc)
+        return (manhattan(state.robot_loc, problem.patient_loc)
+                + manhattan(problem.patient_loc, problem.hospital_loc))
+
+    return run_best_first_search(
+        problem, lambda n: n.g + h(n.state), step_budget)</pre>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3: an outline for the written answer.</strong>
+        <ol>
+          <li>Define the heuristic in one sentence and say what it relaxes (walls and one-way doors).</li>
+          <li>Argue admissibility: unit step costs, and removing walls can only shorten paths.</li>
+          <li>Show a small table: heuristic, <code>num_steps</code>, total path cost. The cost must be the same.</li>
+          <li>Optional extra: show that an inadmissible heuristic (like 2× Manhattan) can be even faster but loses the optimality guarantee. On this maze it may still find the optimal path by luck, so say that explicitly.</li>
+        </ol>
+      </div>
+    </div>
+    <fieldset class="check" data-answer="a" data-explain="Removing walls is a relaxation: every real path is still allowed in the relaxed problem, so the relaxed optimal cost can only be lower or equal. That's exactly admissibility.">
+      <legend>Check: why is the two-leg Manhattan heuristic admissible even though the maze has walls?</legend>
+      <label><input type="radio" name="q1b" value="a"> Walls can only make the real path longer than the wall-free path, never shorter</label>
+      <label><input type="radio" name="q1b" value="b"> Because A* will correct any overestimate later</label>
+      <label><input type="radio" name="q1b" value="c"> Because the maze happens to have no walls on the optimal path</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <!-- ============================== CONCEPT: FIRE ============================== -->
+  <section class="concept" id="c-fire">
+    <span class="tag c">Concept</span>
+    <h2>How the fire spreads, and how to predict it</h2>
+    <h3>The rule</h3>
+    <p>At every time step, each cell independently chooses one cell from its 3×3 neighborhood, <strong>including itself</strong>, with probability proportional to the weight matrix <code>W</code>. It then <em>copies that neighbor's fire value from the previous step</em>. Neighbors outside the grid count as "no fire."</p>
+    <p>With the default <code>W = [[0,1,0],[1,4,1],[0,1,0]]</code>, a cell keeps its own value with probability 4/8 and copies each of its four direct neighbors with probability 1/8. In <code>just_wait</code>, the center weight is 20, so a cell keeps its value 20/24 ≈ 83% of the time and fire moves slowly. In <code>the_circle</code>, only the center weight is nonzero, so nothing ever changes.</p>
+    <div class="why">
+      <strong>Why this matters for planning</strong>
+      Fire doesn't just grow, it also <em>drifts and dies out</em>. Fire spreads by copying, and the edge of the grid always supplies "no fire," so the expected amount of fire slowly decreases over time. A cell that's dangerous now may be safe in 30 steps. That's the reason waiting can be a good plan.
+    </div>
+
+    <h3>From samples to probabilities: the marginal update</h3>
+    <p>For planning, we don't want one random future. We want <em>the probability that each cell is on fire at time t</em>, given the fire we see now. This is the <strong>marginal</strong> probability of each cell. It's easy to compute because of linearity of expectation.</p>
+    <p>Start with the notebook's suggested example: two cells X and Y, uniform weights. At each step, X copies itself or Y with probability ½ each. So:</p>
+    <div class="eq">
+      P(X<sub>t</sub> = 1) = ½·P(X<sub>t−1</sub> = 1) + ½·P(Y<sub>t−1</sub> = 1)
+    </div>
+    <p>This works because "which neighbor X copies" is chosen independently of the current fire. The rule holds for the probabilities just as it does for the 0/1 values. In general:</p>
+    <div class="eq">
+      P<sub>t</sub>(i, j) = Σ<sub>neighbors (i′, j′)</sub> W̃[i′ − i + 1, j′ − j + 1] · P<sub>t−1</sub>(i′, j′)
+      &nbsp;&nbsp;=&nbsp;&nbsp; (P<sub>t−1</sub> ⊛ W̃)(i, j)
+    </div>
+    <p>Here <code>W̃</code> is <code>W</code> normalized to sum to 1. This is exactly what <code>FireProcess.dist</code> computes. It was written for a 0/1 grid, but it works the same on a grid of probabilities. So:</p>
+    <div class="eq">
+      P<sub>0</sub> = the observed fire grid (0s and 1s)<br>
+      P<sub>t</sub> = dist(P<sub>t−1</sub>) &nbsp; — apply the same convolution t times
+    </div>
+    <div class="note">I checked this against simulation: averaging 20,000 sampled 5-step fire runs matches the repeated-convolution marginals to within about 0.005 in every cell. The formula is <em>exact</em> for single-cell marginals. The approximation only appears later, when we treat different cells and times as independent.</div>
+
+    <div class="widget" id="fire-widget">
+      <h3>Try it: marginals vs. one sampled future</h3>
+      <p class="plain">This is the <code>just_wait</code> grid with its initial fire at (4,0), (4,2), and (5,3). On the left, each cell's probability of fire at time t, from repeated convolution. On the right, one random run of the actual process. The left grid is the average over infinitely many runs like the right one.</p>
+      <div class="row">
+        <label class="slider">t <input id="fire-t" type="range" min="0" max="80" step="1" value="0"> <output id="fire-t-out">0</output></label>
+        <label class="slider">weights
+          <select id="fire-w">
+            <option value="20">just_wait: center 20</option>
+            <option value="4">default / the_choice: center 4</option>
+            <option value="c">the_circle: center only</option>
+          </select>
+        </label>
+        <button type="button" class="ghost" id="fire-resample">New sample</button>
+      </div>
+      <div class="grids">
+        <div class="gridbox"><p>Marginal P(fire at t)</p><div class="board" id="fire-marg"></div></div>
+        <div class="gridbox"><p>One sampled run at t</p><div class="board" id="fire-samp"></div></div>
+        <div class="stat" id="fire-stats" style="flex:1 1 11rem"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== CONCEPT: DETERMINIZE ============================== -->
+  <section class="concept" id="c-determinize">
+    <span class="tag c">Concept</span>
+    <h2>Determinization: turning "survive the fire" into a shortest-path problem</h2>
+    <p>The fire MDP is hard to plan in directly. Its state includes the whole fire grid, which has 2<sup>(rows×cols)</sup> possible values. The idea behind Part 2 is to <strong>drop the fire from the state</strong> and account for it through the step costs instead.</p>
+
+    <h3>Step 1: what are we optimizing?</h3>
+    <p>Pick a fixed sequence of moves. Its chance of success is the probability of not burning at any step. If we treat each step's fire as independent (an approximation, discussed below), this is a product:</p>
+    <div class="eq">P(survive the plan) ≈ ∏<sub>t</sub> (1 − p<sub>t</sub>), &nbsp; where p<sub>t</sub> = P(fire at the robot's cell at time t)</div>
+
+    <h3>Step 2: turn the product into a sum</h3>
+    <p>Shortest-path algorithms <em>add</em> costs along a path. Taking a log turns a product into a sum, and negating turns "maximize" into "minimize":</p>
+    <div class="eq">
+      maximize ∏(1 − p<sub>t</sub>) &nbsp;⇔&nbsp; maximize Σ log(1 − p<sub>t</sub>) &nbsp;⇔&nbsp; minimize Σ −log(1 − p<sub>t</sub>)
+    </div>
+    <p>So the step cost is <code>−log(1 − p)</code>. It's 0 when the cell is certainly safe (p = 0), small for small p (about p), and infinite when the cell is certainly on fire (p = 1). The cheapest path is the plan most likely to succeed.</p>
+    <p>The extra <code>c = 1e-6</code> per step does two things. It breaks ties toward shorter plans, and it gives every step a positive cost, so A* doesn't treat endless loops through safe cells as free.</p>
+
+    <div class="widget" id="logcost-widget">
+      <h3>Try it: costs add up to survival probability</h3>
+      <p class="plain">A three-step plan. Set the fire probability at each step. The sum of the step costs is exactly −log(probability of surviving all three steps).</p>
+      <div class="row">
+        <label class="slider">p₁ <input id="lc-1" type="range" min="0" max="0.99" step="0.01" value="0.05"> <output id="lc-1-out"></output></label>
+        <label class="slider">p₂ <input id="lc-2" type="range" min="0" max="0.99" step="0.01" value="0.30"> <output id="lc-2-out"></output></label>
+        <label class="slider">p₃ <input id="lc-3" type="range" min="0" max="0.99" step="0.01" value="0.10"> <output id="lc-3-out"></output></label>
+      </div>
+      <table class="trace" id="lc-table"></table>
+      <p id="lc-summary"></p>
+    </div>
+
+    <h3>Step 3: put time in the state</h3>
+    <p>Fire probabilities change over time, so the cost of stepping into cell (3,1) depends on <em>when</em> you get there. The determinized state is therefore <code>(robot_loc, carried_patient, time)</code>, and <code>time</code> indexes into the precomputed marginals P<sub>t</sub>.</p>
+    <div class="why">
+      <strong>Why time is the key to "just wait"</strong>
+      There's no "stay" action. But with time in the state, <code>((0,1), False, t=3)</code> and <code>((0,1), False, t=5)</code> are different states. A* can find plans that walk back and forth along the safe top row while the fire near the corridor dies down, then go. Without time in the state, revisiting a cell would look like a pointless loop and "waiting" couldn't be expressed.
+    </div>
+
+    <h3>Step 4: replan every step</h3>
+    <p>The agent doesn't follow the whole plan. It takes <em>only the first action</em>, sees the real new fire grid, and replans from scratch using that observation. This is <em>receding-horizon replanning</em>. It corrects a lot of the approximation error, because the plan is always based on what's actually burning now.</p>
+
+    <h3>What determinization gets wrong</h3>
+    <ol>
+      <li><strong>Independence across time.</strong> If a cell isn't on fire now, it probably won't be next step either. The product formula ignores this, so it's <em>pessimistic</em> about long paths near fire. In <code>just_wait</code>, for the route straight down and back up without waiting, the determinized survival estimate is about 0.39. Simulating that exact route gives about 0.50.</li>
+      <li><strong>Open-loop evaluation.</strong> Each plan is scored as if the robot will follow it no matter what happens. Replanning means it won't, but the <em>choice between</em> plans doesn't account for that. Routes that keep options open are undervalued. This is the topic of 2D.</li>
+    </ol>
+  </section>
+
+  <!-- ============================== 2A ============================== -->
+  <section id="p2a">
+    <span class="tag p">Part 2 · graded through 2C/2D</span>
+    <h2>2A · <code>DeterminizedFireMDP</code></h2>
+    <p class="kicker">Reference solution: 91 lines including the provided code</p>
+    <p>You're implementing a <code>PathCostProblem</code>, the same interface as <code>PickupProblem</code>, with states that include time. It has six methods. Most of them reuse <code>self.pickup_problem</code>.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th>What it should do</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td><code>actions(state)</code></td><td>Legal grid moves from <code>state.robot_loc</code>.</td><td>Call <code>self.pickup_problem.actions(state)</code>. It only reads <code>robot_loc</code>.</td></tr>
+        <tr><td><code>step(state, action)</code></td><td>Move, pick up the patient if you land on them, and advance time by 1.</td><td>Use <code>self.pickup_problem.step</code>, then build a <code>DeterminizedFireMDPState</code> with <code>time=state.time + 1</code>.</td></tr>
+        <tr><td><code>goal_test(state)</code></td><td>At the hospital with the patient.</td><td>Call <code>self.pickup_problem.goal_test(state)</code>.</td></tr>
+        <tr><td><code>fire_dist_at_time(t)</code></td><td>Grid of P(fire) at time t.</td><td>Repeated <code>self.fire_process.dist</code>, cached in <code>self.fire_dists_cache</code>.</td></tr>
+        <tr><td><code>step_cost(s1, a, s2)</code></td><td><code>c − log(1 − p)</code>, where p is the fire probability at <code>s2.robot_loc</code> at time <code>s2.time</code>.</td><td>Look up <code>fire_dist_at_time(s2.time)[s2.robot_loc]</code>.</td></tr>
+        <tr><td><code>h(state)</code></td><td>Two-leg Manhattan distance × <code>action_cost</code>.</td><td>Your 1B heuristic, scaled by <code>c</code>.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h3>Why the heuristic is scaled by c</h3>
+    <p>Each step costs <code>c + (−log(1 − p))</code>, and the fire term is ≥ 0. So any path to the goal of length L costs at least <code>c·L</code>, and L is at least the Manhattan distance. Therefore <code>c × Manhattan</code> is admissible. Without the scaling, Manhattan would be on the order of 10 while real costs are on the order of 10⁻⁶ to 1, so it would overestimate badly and A* would no longer find the safest plan.</p>
+    <p class="plain">This heuristic is weak: the fire term usually dominates the cost and the heuristic ignores it entirely. That's acceptable, because it's still admissible and the search is still correct. It's just closer to uniform-cost search than to an informed A*.</p>
+
+    <h3>Which time index to use</h3>
+    <p>The formula in the notebook charges for <code>on_fire<sub>t+1</sub>(s<sub>t+1</sub>)</code>: the danger is where you <em>end up</em>, at the time you arrive. This matches the real reward. <code>FireMDP.step</code> moves the robot and samples the next fire grid together, and you burn if the <em>new</em> grid has fire at your <em>new</em> location. Since <code>s2.time = s1.time + 1</code>, use <code>fire_dist_at_time(s2.time)[s2.robot_loc]</code>.</p>
+
+    <div class="pitfall">
+      <strong>Common mistakes</strong>
+      <ul>
+        <li><strong>Using p at the old cell or the old time.</strong> This is an off-by-one error that makes the agent react one step late.</li>
+        <li><strong><code>log(0)</code>.</strong> If p = 1 exactly, <code>−log(1 − p)</code> is <code>inf</code> and NumPy prints a warning. That's correct (never step there), but clip p to something like <code>1 − 1e-12</code> or return <code>float("inf")</code> explicitly to avoid the warning.</li>
+        <li><strong>Integer arrays.</strong> The observed fire grid is boolean. Convert it with <code>.astype(float)</code> before convolving, or the probabilities may be cast back to 0/1.</li>
+        <li><strong>Recomputing from scratch.</strong> Computing <code>dist</code> t times for each of thousands of A* expansions is very slow. Compute P<sub>t</sub> from the cached P<sub>t−1</sub>.</li>
+        <li><strong>Deep recursion.</strong> A recursive <code>fire_dist_at_time(t-1)</code> works but can hit Python's recursion limit at large t. A loop that fills the cache up to t is safer.</li>
+        <li><strong>"Log-likelihood" vs. probability.</strong> The notebook text says <code>fire_dist_at_time</code> computes the log-likelihood, but the function's docstring says it returns the marginal distribution. Either works as long as <code>step_cost</code> matches. Returning probabilities is simpler.</li>
+      </ul>
+    </div>
+
+    <div class="hints" data-hints="p2a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1: the cache.</strong> <code>fire_dists_cache</code> is a <code>dict</code> on a frozen dataclass. You can't reassign the attribute, but you can modify the dict in place. Store P<sub>0</sub> at key 0 and fill in keys in order:
+        <pre>def fire_dist_at_time(self, t):
+    cache = self.fire_dists_cache
+    if 0 not in cache:
+        cache[0] = self.fire_process.initial_fire_grid.astype(float)
+    k = max(cache)                    # largest t computed so far
+    while k &lt; t:
+        cache[k + 1] = self.fire_process.dist(cache[k])
+        k += 1
+    return cache[t]</pre>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2: <code>step</code> and <code>step_cost</code>.</strong>
+        <pre>def step(self, state, action):
+    nxt = self.pickup_problem.step(state, action)
+    return DeterminizedFireMDPState(nxt.robot_loc, nxt.carried_patient,
+                                    time=state.time + 1)
+
+def step_cost(self, state1, action, state2):
+    p = self.fire_dist_at_time(state2.time)[state2.robot_loc]
+    p = min(p, 1 - 1e-12)
+    return self.action_cost - np.log(1 - p)</pre>
+        <code>pickup_problem.step</code> returns a plain <code>PickupProblemState</code> without time, which is why you rebuild it.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3: the rest.</strong> <code>actions</code> and <code>goal_test</code> are one line each and delegate to <code>self.pickup_problem</code>. For <code>h</code>, copy your 1B heuristic, read the locations from <code>self.pickup_problem</code>, and multiply by <code>self.action_cost</code>.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="Each step's cost includes c plus a nonnegative fire term, so a path of length L costs at least c·L ≥ c·Manhattan. Unscaled Manhattan (~10) would dwarf real costs and overestimate badly.">
+      <legend>Check: why multiply the Manhattan heuristic by c = 1e-6?</legend>
+      <label><input type="radio" name="q2a" value="a"> To make A* run faster by shrinking the numbers</label>
+      <label><input type="radio" name="q2a" value="b"> Because each step is only guaranteed to cost c, so unscaled Manhattan would overestimate and break admissibility</label>
+      <label><input type="radio" name="q2a" value="c"> Because the fire probabilities are around 1e-6</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <!-- ============================== 2B ============================== -->
+  <section id="p2b">
+    <span class="tag p">Part 2</span>
+    <h2>2B · The replanning agent</h2>
+    <p class="kicker">You only write <code>determinized_problem</code> · reference: 36 lines including the provided code</p>
+    <p class="sig">determinized_problem(self, state: FireMDPState) → DeterminizedFireMDP</p>
+    <p><code>act</code> is already written. It builds a determinized problem <em>starting from the current real state</em>, runs A*, and returns the first action. Your job is to build that problem: a copy of the original, but with</p>
+    <ul>
+      <li>the robot starting where it is now,</li>
+      <li>the fire starting from the fire grid observed now, so that P<sub>0</sub> is today's real fire, and</li>
+      <li>the patient already carried if the robot has picked them up.</li>
+    </ul>
+    <p>The <code>dataclasses.replace(obj, field=new_value)</code> function returns a copy of a frozen dataclass with some fields changed. Use it on <code>self.problem.pickup_problem</code> and <code>self.problem.fire_process</code>, then build a new <code>DeterminizedFireMDP</code> from them.</p>
+
+    <div class="pitfall">
+      <strong>The common bug: losing the patient after pickup</strong>
+      <code>PickupProblem</code> has no field for "starts carrying the patient." Its <code>initial</code> property computes it as <code>initial_robot_loc == patient_loc</code>. After pickup, the robot moves away from the patient's original cell, so if you only update <code>initial_robot_loc</code>, the new problem thinks the patient is still waiting at their old location. The agent then goes back for someone it's already carrying, and in a one-way maze it may not be able to.
+      <br><br>
+      <strong>Fix:</strong> if <code>state.carried_patient</code> is true, also set <code>patient_loc=state.robot_loc</code>. Then <code>initial</code> returns <code>carried_patient=True</code>, <code>step</code> keeps it true (<code>carried or ...</code>), and the heuristic's "carrying" case applies.
+    </div>
+    <div class="why">
+      <strong>Why build a new problem every step?</strong>
+      The marginals P<sub>t</sub> depend on the fire you observe <em>now</em>. If the fire next to the corridor happens to die out, the new P<sub>0</sub> shows that, and every future P<sub>t</sub> becomes safer. A new <code>DeterminizedFireMDP</code> also gets an empty <code>fire_dists_cache</code> (it's a <code>default_factory</code>), so marginals from an old observation are never reused.
+    </div>
+    <div class="hints" data-hints="p2b">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1: which fields to replace.</strong> <code>PickupProblem</code>: <code>initial_robot_loc</code>, and <code>patient_loc</code> if carrying. <code>FireProcess</code>: <code>initial_fire_grid</code>. Leave the weights, walls, and hospital unchanged.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2: code.</strong>
+        <pre>def determinized_problem(self, state):
+    pp = self.problem.pickup_problem
+    patient = state.robot_loc if state.carried_patient else pp.patient_loc
+    pickup = dataclasses.replace(pp, initial_robot_loc=state.robot_loc,
+                                 patient_loc=patient)
+    fire = dataclasses.replace(self.problem.fire_process,
+                               initial_fire_grid=state.fire_grid)
+    return DeterminizedFireMDP(pickup, fire)</pre>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3: sanity check.</strong> Run it on <code>just_wait</code> with <code>verbose=True</code>. If you see <code>"Search failed, performing a random action"</code> often, A* is running out of its 10,000-step budget. Check that your heuristic is scaled by <code>c</code> (an unscaled heuristic can steer the search into wasted work) and that your cache is used. Note that in <code>just_wait</code>, a random action at the start means entering the corridor without waiting.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== 2C ============================== -->
+  <section id="p2c">
+    <span class="tag p">Part 2 · 15 points</span>
+    <h2>2C · Experiment 1: <code>just_wait</code></h2>
+    <p class="kicker">Deliverable: just_wait_determinized.mp4</p>
+    <p>The robot starts at (0,1) at the top of a <strong>one-way corridor</strong>. The patient is at the bottom left, and the hospital is at the top right, reached by another one-way corridor going up. Fire starts next to both corridors. Once the robot enters, it can't come back up.</p>
+    <p>A correct agent <strong>patrols the top row for a while</strong> (moving back and forth between safe cells), then goes down when the corridor looks safe enough.</p>
+    <h3>Why the agent waits, in numbers</h3>
+    <p>The chart below uses your 2A machinery directly. Take the 18-step route (down the left corridor, pick up the patient, across, up the right corridor), and start it after waiting w steps. Using the marginals from the <em>initial</em> fire grid, compute the determinized survival estimate ∏(1 − p<sub>t</sub>). The dots show the true survival rate of the same route from simulation, which is always higher because the estimate assumes independence.</p>
+    <div class="widget" id="wait-widget">
+      <h3>Survival of the fixed route vs. waiting time</h3>
+      <div id="wait-chart"></div>
+      <p class="legend">Line: determinized estimate exp(−Σ cost) from the initial fire grid. Dots: simulated survival of the same open-loop route, 3,000 runs per point (computed offline with the real <code>FireProcess</code>).</p>
+      <p class="plain" id="wait-read"></p>
+    </div>
+    <p>Notice that the curve <em>dips</em> during the first few steps of waiting. The fire is spreading toward the corridor before it thins out. After that, the longer you wait, the safer the route, and waiting along the top row costs almost nothing (about c per step, since there's essentially no fire there). So the plan includes a lot of waiting. The real agent also replans each step: if the sampled fire near the corridor dies out early, the new marginals show it and the robot leaves earlier.</p>
+    <p class="plain">Why it eventually leaves: the waiting cost is tiny but positive, and as the remaining risk shrinks, each additional lap reduces it by less. Eventually one more lap isn't worth even c, or the observed fire is low enough that A* prefers to go now.</p>
+
+    <h3>Getting the required video</h3>
+    <p>You need a run that <strong>succeeds</strong> and where <strong>some fire is still on the grid when the robot leaves the top row</strong>. Not every run qualifies (the fire sometimes dies out completely first), so loop until one does:</p>
+    <pre>problem = get_problem("just_wait")
+agent = FireMDPDeterminizedAStarAgent(problem)
+
+for trial in range(30):
+    states, actions, total = run_agent_on_problem(problem, agent, verbose=False)
+    if not problem.succeeded(states[-1]):
+        continue
+    leave = next(i for i, s in enumerate(states) if s.robot_loc[0] &gt; 0)
+    if states[leave].fire_grid.any():
+        print(f"trial {trial}: waited {leave - 1} steps, total reward {total:.3f}")
+        break
+
+anim = animate_trajectory(problem, (states, actions))
+anim.save("just_wait_determinized.mp4")</pre>
+    <p class="plain">If you can't get a run like this after about 15 tries, the notebook says your agent is probably buggy. Check the step-cost timing and the carried-patient fix first.</p>
+  </section>
+
+  <!-- ============================== 2D ============================== -->
+  <section id="p2d">
+    <span class="tag p">Part 2 · 15 points</span>
+    <h2>2D · Experiment 2: <code>the_choice</code></h2>
+    <p class="kicker">Deliverable: the_choice_determinized.mp4 + a short answer</p>
+    <p>From the start, the robot must choose:</p>
+    <ul>
+      <li><strong><code>down</code>:</strong> a short one-way corridor along the left edge to the bottom row. Fire is just on the other side of its wall, and once inside the robot can't stop or hide.</li>
+      <li><strong><code>right</code>:</strong> into a large room with more fire but plenty of space. The robot can move around and wait for a clear route before heading down.</li>
+    </ul>
+    <h3>Why the determinized agent tends to choose <code>down</code></h3>
+    <p>Think about how each option is <em>evaluated</em>. The determinized planner scores a fixed sequence of cells. For the room, it must pick one specific route through the room now, using today's marginals, and that route has to cross cells that are moderately likely to be on fire. It can't express "I'll go around whichever fire is in the way when I get there." A smart agent in the room would see where the fire is and route around it. The value of that flexibility is called <strong>option value</strong>, and open-loop scoring ignores it.</p>
+    <p>The corridor gives no flexibility either way, so open-loop scoring rates it accurately. Comparing an accurately scored corridor with a room scored too pessimistically biases the choice toward the corridor.</p>
+
+    <div class="widget" id="choice-widget">
+      <h3>Toy model: open-loop vs. closed-loop scoring</h3>
+      <p class="plain">This is a simplified version of the choice, not the real map. The corridor has k cells with fire probability q each. To get through the room, you must cross one gap, and there are m gaps, each blocked by fire independently with probability p. The open-loop planner commits to one gap now. A closed-loop agent looks first and takes any open gap.</p>
+      <div class="row">
+        <label class="slider">corridor cells k <input id="ch-k" type="range" min="1" max="10" step="1" value="4"> <output id="ch-k-out"></output></label>
+        <label class="slider">corridor p(fire) q <input id="ch-q" type="range" min="0" max="0.5" step="0.01" value="0.08"> <output id="ch-q-out"></output></label>
+      </div>
+      <div class="row">
+        <label class="slider">room gaps m <input id="ch-m" type="range" min="1" max="5" step="1" value="3"> <output id="ch-m-out"></output></label>
+        <label class="slider">gap p(fire) p <input id="ch-p" type="range" min="0" max="0.9" step="0.01" value="0.35"> <output id="ch-p-out"></output></label>
+      </div>
+      <table class="trace" id="ch-table"></table>
+      <p id="ch-summary"></p>
+    </div>
+
+    <div class="hints" data-hints="p2d">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1: what to report.</strong> Run the agent several times. Check the first action and the path it takes, and record how often it picks each option and how often it survives. You still need one <em>successful</em> run as the video, so use a loop like the one in 2C, checking <code>problem.succeeded(states[-1])</code>.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2: an outline for the written answer.</strong>
+        <ol>
+          <li>State the choice your agent made (and whether it was consistent across runs).</li>
+          <li>Explain it using the cost function: the open-loop path cost of the corridor was lower than that of any single fixed route through the room.</li>
+          <li>Explain why that's misleading: replanning lets the agent react in the room, but the planner doesn't account for that ability when choosing. Also mention that the independence assumption makes long routes near fire look worse than they are.</li>
+          <li>Connect to Part 3: a planner that simulates real futures and evaluates what the agent does after observing should value the room's flexibility.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== CONCEPT: MCTS ============================== -->
+  <section class="concept" id="c-mcts">
+    <span class="tag c">Concept</span>
+    <h2>Monte Carlo tree search</h2>
+    <p>MCTS skips both the probability calculations and the determinization. It uses the MDP only as a <strong>simulator</strong>: <code>problem.step(state, action)</code> draws a real random next state, including a sampled fire grid. The planner repeatedly imagines futures from the current state, records which first actions led to good outcomes, and spends more simulations on the promising ones.</p>
+    <h3>One iteration, four phases (as in <code>run_mcts_search</code>)</h3>
+    <ol>
+      <li><strong>Select.</strong> Starting at the root, pick an action at each tree node using UCB (below), then sample a next state from the simulator. Continue until you reach a node with no children yet, or a sampled next state the tree hasn't seen.</li>
+      <li><strong>Expand.</strong> Add a child for every action at that leaf, pick one at random, and sample its next state.</li>
+      <li><strong>Simulate.</strong> From there, play <em>random</em> actions until the episode ends or the horizon is reached, adding up discounted reward. This is done <code>n_simulations = 10</code> times and averaged.</li>
+      <li><strong>Back up.</strong> Pass the value up the path, updating each action's total value <code>U</code> and visit count <code>N</code>. With <code>max_backup=True</code>, a state's value is the <em>best</em> average among its actions, not the average of everything tried.</li>
+    </ol>
+    <p>After <code>iteration_budget</code> iterations, it returns the root action with the highest average value <code>U/N</code>.</p>
+
+    <h3>UCB: balancing exploration and exploitation</h3>
+    <div class="eq">UCB(a) = U(a)/N(a) &nbsp;+&nbsp; C·√( ln N(parent) / N(a) )</div>
+    <p>The first term favors actions that have worked well (<strong>exploit</strong>). The second term is large for actions tried only a few times (<strong>explore</strong>), and it shrinks as an action is tried more. Untried actions get UCB = ∞, so every action is tried at least once. <code>C</code> controls the balance; the default is √2.</p>
+    <p class="plain">This is the same idea as PS7's exploration bonus <code>k / (N + 1)</code>, applied to planning instead of learning.</p>
+
+    <div class="widget" id="ucb-widget">
+      <h3>Try it: which action does UCB select next?</h3>
+      <p class="plain">U is the sum of values backed up through that action. Rewards are between −1 and +1. N(parent) is taken as the sum of the N values.</p>
+      <div class="row"><label class="slider">C <input id="ucb-c" type="range" min="0" max="3" step="0.05" value="1.41"> <output id="ucb-c-out"></output></label></div>
+      <table class="trace" id="ucb-table"></table>
+      <p id="ucb-summary"></p>
+    </div>
+
+    <h3>Why MCTS should handle 2D's problem better</h3>
+    <ul>
+      <li><strong>Real samples, not marginals.</strong> Rollouts use <code>FireProcess.sample</code>, so fire stays correlated over time. No independence approximation.</li>
+      <li><strong>Closed-loop values.</strong> Inside the tree, the robot's next action is chosen <em>after</em> the sampled fire is known. In principle, a branch where the robot enters the room and adjusts to the fire is scored by how well it can adjust.</li>
+    </ul>
+    <div class="warn">
+      <strong>Honest caveats</strong>
+      <ul style="margin-bottom:0">
+        <li><strong>The tree is shallow here.</strong> A state includes the whole fire grid, and every <code>step</code> samples a new grid. The same next state almost never appears twice, so <code>select</code> creates a new leaf after about one level. With 10–50 iterations, the tree is roughly "one level of real choices, then random rollouts." (In <code>the_circle</code>, the fire never changes, so states repeat and the tree can grow deeper.)</li>
+        <li><strong>Random rollouts are a weak value estimate.</strong> They estimate "how well does a <em>random walk</em> do from here." Random walks rarely reach the hospital within 40 steps on the larger maps. So the values mostly measure "how likely am I to burn soon," and push only weakly toward the goal.</li>
+        <li>Because of both of these, results are noisy with small budgets. Larger <code>iteration_budget</code> values help, and the notebook encourages trying them if you have time.</li>
+      </ul>
+    </div>
+    <div class="note"><strong>The baseline, <code>RolloutLookaheadAgent</code>:</strong> for each action, it runs 10 random rollouts and picks the action with the best average. This is like MCTS with no tree and no UCB, only the "simulate" phase. With <code>receding_horizon=0</code>, the rollouts have length 0, every action scores 0, and the agent acts at random.</div>
+  </section>
+
+  <!-- ============================== 3A ============================== -->
+  <section id="p3a">
+    <span class="tag p">Part 3</span>
+    <h2>3A · <code>MCTSAgent.act</code></h2>
+    <p class="kicker">Reference: 42 lines including the provided code (only a few are yours)</p>
+    <p>The agent only needs to: call <code>run_mcts_search</code> on the current state with the agent's settings, advance its internal clock, and return the action.</p>
+    <div class="sig">run_mcts_search(problem, state=..., horizon=..., C=..., iteration_budget=...) → action</div>
+    <h3>Why the horizon property matters</h3>
+    <p>There are two situations:</p>
+    <ul>
+      <li><strong>Finite-horizon problems</strong> (<code>maze</code>, horizon 20): at time t, only <code>horizon − t</code> steps remain, so the planner shouldn't look further than that. <code>planning_horizon</code> computes this from <code>self.t</code>, which is why you must keep <code>self.t</code> updated.</li>
+      <li><strong>Infinite-horizon problems</strong> (the others): you can't search forever, so you look ahead a fixed amount (<code>receding_horizon</code>, 40 in the benchmarks) every step. The lookahead window moves forward with you.</li>
+    </ul>
+    <div class="pitfall">
+      <strong>Common mistakes</strong>
+      <ul>
+        <li>Forgetting <code>state=state</code>. The default is <code>problem.initial</code>, so the agent would plan from the starting position every step.</li>
+        <li>Incrementing <code>self.t</code> <em>before</em> reading <code>planning_horizon</code>, which makes the horizon one step too short.</li>
+        <li>Not passing <code>C</code> and <code>iteration_budget</code>. The function defaults (<code>iteration_budget=100</code>) would silently override the agent's settings and invalidate your 10-vs-50 comparison.</li>
+      </ul>
+    </div>
+    <div class="hints" data-hints="p3a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint: the body of <code>act</code>.</strong>
+        <pre>def act(self, state):
+    action = run_mcts_search(self.problem,
+                             state=state,
+                             horizon=self.planning_horizon,
+                             C=self.C,
+                             iteration_budget=self.iteration_budget)
+    self.t += 1
+    return action</pre>
+        <code>reset()</code> is already provided and sets <code>t</code> back to 0. <code>run_agent_on_problem</code> calls it at the start of every episode.
+      </div>
+    </div>
+    <fieldset class="check" data-answer="b" data-explain="Without state=state, run_mcts_search defaults to problem.initial and keeps planning from the start position, no matter where the robot actually is.">
+      <legend>Check: you forget to pass <code>state=state</code>. What happens?</legend>
+      <label><input type="radio" name="q3a" value="a"> An error, because state is required</label>
+      <label><input type="radio" name="q3a" value="b"> Every step plans from the problem's initial state, so actions stop making sense after the first move</label>
+      <label><input type="radio" name="q3a" value="c"> Nothing, because MCTS reads the state from the problem object</label>
+      <button type="button">Check</button>
+      <p class="feedback" hidden></p>
+    </fieldset>
+  </section>
+
+  <!-- ============================== 3B ============================== -->
+  <section id="p3b">
+    <span class="tag p">Part 3 · 15 points</span>
+    <h2>3B · Experiment 3: MCTS on <code>the_choice</code></h2>
+    <p class="kicker">Deliverable: the_choice_mcts.mp4</p>
+    <p><code>the_choice</code> has an infinite horizon, so you must pass a <code>receding_horizon</code>. 40 matches the benchmark settings. Use the same loop as in 2C (repeat until <code>problem.succeeded(states[-1])</code>) and save the animation.</p>
+    <pre>problem = get_problem("the_choice")
+agent = MCTSAgent(problem, receding_horizon=40, iteration_budget=50)
+# loop until success, then:
+animate_trajectory(problem, (states, actions)).save("the_choice_mcts.mp4")</pre>
+    <p>Watch the first move. Does the agent go <code>right</code> into the room? Does it move around inside the room as the fire changes? Compare this with your determinized video. Even if the notebook doesn't require it, a sentence comparing the two choices will strengthen your 3C writeup.</p>
+    <div class="note">
+      <strong>Runtime estimate.</strong> Each <code>act</code> call runs <code>iteration_budget × n_simulations</code> rollouts of up to 40 steps, and each step includes a convolution. With a budget of 50, that's 500 rollouts per action. Measured on this machine: about 0.1–0.2 s per action and 2–9 s per episode. A budget of 500 should be roughly 10× slower. Time one episode before running a large batch.
+    </div>
+    <p class="plain">If MCTS still goes <code>down</code> with a budget of 50, try a larger budget before deciding your code is wrong. As described in the MCTS section, small budgets with random rollouts are noisy. Report what you actually observe.</p>
+  </section>
+
+  <!-- ============================== 3C ============================== -->
+  <section id="p3c">
+    <span class="tag p">Part 3 · 40 points</span>
+    <h2>3C · Benchmarks</h2>
+    <p class="kicker">Deliverable: a PDF with a table and written findings</p>
+    <p>This is the biggest part of the grade, and most of it is <em>reading</em> the results, not running code. You compare five agents in four environments, with at least 10 runs each (more is better).</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Agent</th><th>What it represents</th></tr></thead>
+      <tbody>
+        <tr><td><code>RolloutLookaheadAgent(receding_horizon=0)</code></td><td>Uniformly random actions. The floor every other agent should beat.</td></tr>
+        <tr><td><code>RolloutLookaheadAgent(receding_horizon=40)</code></td><td>One step of lookahead, using 10 random rollouts per action.</td></tr>
+        <tr><td><code>FireMDPDeterminizedAStarAgent</code></td><td>Open-loop A* on marginals, replanning every step.</td></tr>
+        <tr><td><code>MCTSAgent(iteration_budget=10, receding_horizon=40)</code></td><td>MCTS with a very small budget.</td></tr>
+        <tr><td><code>MCTSAgent(iteration_budget=50, receding_horizon=40)</code></td><td>MCTS with a moderate budget (or larger, if you have time).</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>How to read the reward numbers</h3>
+    <p>Each run ends near +1 (rescued, slightly discounted, e.g. 0.999<sup>20</sup> ≈ 0.98), near −1 (burned), or exactly 0 (timed out in <code>maze</code>). So the <strong>mean reward is roughly (success rate) − (burn rate)</strong>. A mean of 0.6 means roughly 80% success and 20% burns, or a mix that includes timeouts. Because the results are essentially success/failure, the standard deviation is large almost by necessity. Report a <strong>success rate</strong> next to the mean; it makes the table much easier to read.</p>
+
+    <h3>A harness that produces the table</h3>
+    <pre>import time
+
+def make_agents(problem):
+    return [
+        ("Random",          RolloutLookaheadAgent(problem, receding_horizon=0)),
+        ("Rollout-40",      RolloutLookaheadAgent(problem, receding_horizon=40)),
+        ("Determinized A*", FireMDPDeterminizedAStarAgent(problem)),
+        ("MCTS-10",         MCTSAgent(problem, iteration_budget=10, receding_horizon=40)),
+        ("MCTS-50",         MCTSAgent(problem, iteration_budget=50, receding_horizon=40)),
+    ]
+
+N = 10
+rows = []
+for env in ["maze", "just_wait", "the_circle", "the_choice"]:
+    problem = get_problem(env)
+    for name, agent in make_agents(problem):
+        t0 = time.time()
+        r = np.array(benchmark_agent(problem, agent, n_repeats=N))
+        rows.append((env, name, r.mean(), r.std(), r.min(), r.max(),
+                     (r &gt; 0).mean(), time.time() - t0))
+
+print("| env | agent | mean | std | min | max | success | sec |")
+print("|---|---|---|---|---|---|---|---|")
+for env, name, m, s, lo, hi, succ, sec in rows:
+    print(f"| {env} | {name} | {m:.2f} | {s:.2f} | {lo:.2f} | {hi:.2f} | {succ:.0%} | {sec:.0f} |")</pre>
+    <div class="pitfall">
+      <strong>Things the notebook doesn't mention</strong>
+      <ul>
+        <li><strong><code>compare_agents</code> doesn't accept a dict.</strong> It loops over its argument, so a dict gives it the <em>names</em> instead of the agents. Pass a list of <code>(agent, name)</code> tuples. Note that this order is reversed from the harness above. Also, it only prints its results and doesn't return them, which is why the harness above calls <code>benchmark_agent</code> directly.</li>
+        <li><strong>There's no <code>max_steps</code> parameter.</strong> The notebook's hint mentions one, but the provided <code>benchmark_agent</code> and <code>run_agent_on_problem</code> don't have it. Episodes in infinite-horizon environments end only on rescue or burn, which can take a long time for a random agent. If you need a limit, add a step counter to <code>run_agent_on_problem</code> yourself and state it in your settings.</li>
+        <li><strong>Save results as you go.</strong> A run of several hours that crashes at the end loses everything. Append each row to a CSV inside the loop.</li>
+      </ul>
+    </div>
+
+    <h3>What to look for</h3>
+    <p>Don't assume these patterns; check your table for them. Here's what the analysis above predicts:</p>
+    <ul>
+      <li><strong><code>the_circle</code></strong>: the fire never moves, so the problem is effectively deterministic and the marginals are exact. Determinization has no disadvantage here. Does the determinized agent do as well as or better than everything else?</li>
+      <li><strong><code>maze</code></strong>: no fire, but a 20-step horizon. The danger is <em>timing out</em>, not burning. Random rollouts see no reward signal in a fire-free maze (every rollout scores 0 unless it happens to reach the goal), so look at whether the rollout and MCTS agents have many 0 rewards here.</li>
+      <li><strong><code>just_wait</code></strong>: waiting is rewarded. Which agents wait? Random rollouts can't plan to "wait 20 steps, then go," while the determinized agent can.</li>
+      <li><strong><code>the_choice</code></strong>: the one environment where open-loop scoring is clearly biased. This is where MCTS has its best chance to beat the determinized agent. Does it, and does the 10 vs. 50 budget matter?</li>
+      <li><strong>Budget</strong>: does MCTS-50 beat MCTS-10 consistently, or only on some maps? Is the difference larger than the noise from 10 runs?</li>
+      <li><strong>Cost</strong>: wall-clock time per episode. A planner that's slightly better but 50× slower is a real tradeoff and worth mentioning.</li>
+    </ul>
+    <div class="why">
+      <strong>How to write the findings section</strong>
+      For each observation, give the number, then the explanation based on the agent's assumptions. "Determinized A* scored 1.00 on the_circle because the fire is static, so its marginals are exact and its plan is truly optimal" earns more than "A* did best on the_circle." Mention sample size: with 10 runs, a gap of 0.2 in mean reward between two agents may just be noise. If you used more runs or a larger budget, say so.
+    </div>
+    <div class="hints" data-hints="p3c">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1: what to state above the table.</strong> Number of runs per cell, <code>receding_horizon</code>, <code>iteration_budget</code>, <code>C</code>, <code>n_simulations</code> (default 10), the discount (0.999), any step limit you added, and that rewards are discounted totals. If you changed <code>fire_process.py</code> for Python 3.14, mention that it doesn't change behavior.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2: a structure for the PDF.</strong>
+        <ol>
+          <li>Settings paragraph.</li>
+          <li>The main table (environments × agents), with mean ± std, min, max, and success rate.</li>
+          <li>3–5 findings, each tied to a mechanism: exact marginals (the_circle), waiting and replanning (just_wait), option value (the_choice), horizon and random rollouts (maze), budget, and runtime.</li>
+          <li>One limitation paragraph: sample size, stochasticity, and anything that surprised you.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== SUBMIT ============================== -->
+  <section class="shared" id="submit">
+    <span class="tag s">Wrap-up</span>
+    <h2>Submission checklist</h2>
+    <ul>
+      <li><code>Project02_release.ipynb</code> saved <strong>with outputs</strong>. The 1A output cell is graded.</li>
+      <li>The contributors cell (Part 0) is filled in.</li>
+      <li>The written answers for 1B and 2D are filled in.</li>
+      <li><code>just_wait_determinized.mp4</code>: successful, and fire is still present when the robot leaves the top row.</li>
+      <li><code>the_choice_determinized.mp4</code> and <code>the_choice_mcts.mp4</code>: both successful runs.</li>
+      <li>The benchmark PDF: settings, table, and findings.</li>
+      <li>Any <code>.py</code> file you changed, such as <code>fire_process.py</code> for the Python 3.14 fix.</li>
+      <li>Run the packaging cell (<code>Grader.prepare_submission</code>) after saving.</li>
+    </ul>
+    <p class="plain">Due Wednesday, November 9, 2026, 11:59 pm. The interactive demos here are illustrations built from the provided code. The A* counts and the just_wait curve were checked against the actual Python code, but your own runs are what you should report.</p>
+  </section>
+</main>
+
+<script id="core">
+/* ---------- pure helpers (no DOM) ---------- */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function simpleProblem() {
+  const blocks = new Set();
+  const key = (a, b) => `${a[0]},${a[1]}>${b[0]},${b[1]}`;
+  const one = (a, b) => blocks.add(key(a, b));
+  const wall = (a, b) => { one(a, b); one(b, a); };
+  for (let i = 0; i < 7; i++) { one([i + 1, 1], [i, 1]); one([i, 3], [i + 1, 3]); }
+  for (let i = 1; i < 7; i++) { wall([i, 1], [i, 0]); wall([i, 1], [i, 2]); }
+  wall([0, 0], [1, 0]); wall([7, 0], [6, 0]); wall([0, 2], [1, 2]); wall([7, 2], [6, 2]);
+  return { rows: 8, cols: 4, robot: [0, 1], patient: [7, 0], hospital: [0, 3], blocks, key };
+}
+
+const MOVES = [["up", -1, 0], ["down", 1, 0], ["left", 0, -1], ["right", 0, 1]];
+
+function heuristics(P) {
+  const md = (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+  const two = (s) => s.carried ? md(s.loc, P.hospital) : md(s.loc, P.patient) + md(P.patient, P.hospital);
+  return {
+    zero: () => 0,
+    patient: (s) => s.carried ? md(s.loc, P.hospital) : md(s.loc, P.patient),
+    two,
+    double: (s) => 2 * two(s)
+  };
+}
+
+function cmpState(a, b) {
+  if (a.loc[0] !== b.loc[0]) return a.loc[0] - b.loc[0];
+  if (a.loc[1] !== b.loc[1]) return a.loc[1] - b.loc[1];
+  return (a.carried ? 1 : 0) - (b.carried ? 1 : 0);
+}
+
+function astar(P, h) {
+  // mirrors utils.run_best_first_search: heap of (priority, state, node), goal test on pop
+  const heap = [];
+  let seq = 0;
+  const less = (x, y) => x.pri !== y.pri ? x.pri < y.pri : (cmpState(x.s, y.s) !== 0 ? cmpState(x.s, y.s) < 0 : x.seq < y.seq);
+  const push = (e) => { heap.push(e); let i = heap.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (less(heap[i], heap[p])) { [heap[i], heap[p]] = [heap[p], heap[i]]; i = p; } else break; } };
+  const pop = () => { const top = heap[0]; const last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && less(heap[l], heap[m])) m = l; if (r < heap.length && less(heap[r], heap[m])) m = r; if (m === i) break; [heap[i], heap[m]] = [heap[m], heap[i]]; i = m; } } return top; };
+  const sk = (s) => `${s.loc[0]},${s.loc[1]},${s.carried ? 1 : 0}`;
+  const start = { loc: P.robot, carried: P.robot[0] === P.patient[0] && P.robot[1] === P.patient[1] };
+  const root = { s: start, parent: null, action: null, g: 0 };
+  const reached = new Map([[sk(start), root]]);
+  push({ pri: h(start), s: start, node: root, seq: seq++ });
+  const expanded = Array.from({ length: P.rows }, () => Array(P.cols).fill(0));
+  let steps = 0;
+  while (heap.length) {
+    const { node } = pop();
+    const s = node.s;
+    if (s.carried && s.loc[0] === P.hospital[0] && s.loc[1] === P.hospital[1]) {
+      const acts = [];
+      let n = node;
+      while (n.parent) { acts.unshift(n.action); n = n.parent; }
+      return { steps, expanded, cost: node.g, actions: acts };
+    }
+    expanded[s.loc[0]][s.loc[1]] += 1;
+    for (const [name, dr, dc] of MOVES) {
+      const nr = s.loc[0] + dr, nc = s.loc[1] + dc;
+      if (nr < 0 || nr >= P.rows || nc < 0 || nc >= P.cols) continue;
+      if (P.blocks.has(P.key(s.loc, [nr, nc]))) continue;
+      const child = { loc: [nr, nc], carried: s.carried || (nr === P.patient[0] && nc === P.patient[1]) };
+      steps += 1;
+      const g = node.g + 1;
+      const prev = reached.get(sk(child));
+      if (!prev || g < prev.g) {
+        const cn = { s: child, parent: node, action: name, g };
+        reached.set(sk(child), cn);
+        push({ pri: g + h(child), s: child, node: cn, seq: seq++ });
+      }
+    }
+  }
+  return null;
+}
+
+function fireKernel(kind) {
+  if (kind === "c") return [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
+  const c = Number(kind);
+  const raw = [[0, 1, 0], [1, c, 1], [0, 1, 0]];
+  const sum = 4 + c;
+  return raw.map((r) => r.map((v) => v / sum));
+}
+
+function fireDist(grid, K) {
+  const R = grid.length, C = grid[0].length;
+  const out = Array.from({ length: R }, () => Array(C).fill(0));
+  for (let i = 0; i < R; i++) for (let j = 0; j < C; j++) {
+    let s = 0;
+    for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) {
+      const a = i + di, b = j + dj;
+      if (a < 0 || a >= R || b < 0 || b >= C) continue;
+      s += K[di + 1][dj + 1] * grid[a][b];
+    }
+    out[i][j] = Math.min(1, Math.max(0, s));
+  }
+  return out;
+}
+
+function justWaitFire() {
+  const g = Array.from({ length: 8 }, () => Array(4).fill(0));
+  g[4][0] = 1; g[4][2] = 1; g[5][3] = 1;
+  return g;
+}
+
+function marginals(T, K) {
+  const out = [justWaitFire()];
+  for (let t = 0; t < T; t++) out.push(fireDist(out[t], K));
+  return out;
+}
+
+const JW_ROUTE = [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[7,0],[7,1],[7,2],[7,3],[6,3],[5,3],[4,3],[3,3],[2,3],[1,3],[0,3]];
+
+function routeSurvival(M, w) {
+  let cost = 0;
+  JW_ROUTE.forEach((cell, k) => { cost += -Math.log1p(-Math.min(M[w + 1 + k][cell[0]][cell[1]], 1 - 1e-12)); });
+  return Math.exp(-cost);
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  setupHints();
+  setupChecks();
+  setupAstar();
+  setupFire();
+  setupLogCost();
+  setupWait();
+  setupChoice();
+  setupUCB();
+});
+
+function setupHints() {
+  let store = {};
+  try { store = JSON.parse(localStorage.getItem("proj2-guide-hints") || "{}"); } catch (e) { store = {}; }
+  document.querySelectorAll(".hints").forEach((box) => {
+    const id = box.dataset.hints;
+    const hints = [...box.querySelectorAll(".hint")];
+    const next = box.querySelector(".hint-next");
+    const reset = box.querySelector(".hint-reset");
+    const count = box.querySelector(".hint-count");
+    let shown = Math.min(store[id] || 0, hints.length);
+    const paint = () => {
+      hints.forEach((h, i) => { h.hidden = i >= shown; });
+      count.textContent = shown === 0 ? "" : `Showing ${shown} of ${hints.length}`;
+      next.hidden = shown >= hints.length;
+      next.textContent = shown === 0 ? "Reveal a hint" : "Reveal the next hint";
+      store[id] = shown;
+      try { localStorage.setItem("proj2-guide-hints", JSON.stringify(store)); } catch (e) {}
+    };
+    next.addEventListener("click", () => { shown = Math.min(hints.length, shown + 1); paint(); });
+    reset.addEventListener("click", () => { shown = 0; paint(); });
+    paint();
+  });
+}
+
+function setupChecks() {
+  document.querySelectorAll("fieldset.check").forEach((box) => {
+    const button = box.querySelector("button");
+    const feedback = box.querySelector(".feedback");
+    button.addEventListener("click", () => {
+      const picked = box.querySelector("input:checked");
+      feedback.hidden = false;
+      if (!picked) {
+        feedback.className = "feedback bad";
+        feedback.textContent = "Pick an answer first.";
+        return;
+      }
+      const ok = picked.value === box.dataset.answer;
+      feedback.className = ok ? "feedback good" : "feedback bad";
+      feedback.textContent = (ok ? "Correct. " : "Not quite. ") + box.dataset.explain;
+    });
+  });
+}
+
+function setupAstar() {
+  const P = simpleProblem();
+  const H = heuristics(P);
+  const sel = document.getElementById("astar-h");
+  const board = document.getElementById("astar-board");
+  const stats = document.getElementById("astar-stats");
+  board.style.gridTemplateColumns = `repeat(${P.cols}, auto)`;
+  const blocked = (a, b) => P.blocks.has(P.key(a, b));
+  const reachable = new Set(["0,0","0,1","0,2","0,3","7,0","7,1","7,2","7,3"]);
+  for (let r = 1; r < 7; r++) { reachable.add(`${r},1`); reachable.add(`${r},3`); }
+  const baseline = astar(P, H.zero);
+  const paint = () => {
+    const res = astar(P, H[sel.value]);
+    const maxE = Math.max(1, ...res.expanded.flat());
+    let html = "";
+    for (let r = 0; r < P.rows; r++) for (let c = 0; c < P.cols; c++) {
+      const cls = ["c"];
+      if (r + 1 < P.rows && blocked([r, c], [r + 1, c]) && blocked([r + 1, c], [r, c])) cls.push("wb");
+      if (c + 1 < P.cols && blocked([r, c], [r, c + 1]) && blocked([r, c + 1], [r, c])) cls.push("wr");
+      const isDead = !reachable.has(`${r},${c}`);
+      if (isDead) cls.push("dead");
+      let arrow = "";
+      if (r > 0 && blocked([r, c], [r - 1, c]) && !blocked([r - 1, c], [r, c])) arrow = "↓";
+      if (r + 1 < P.rows && blocked([r, c], [r + 1, c]) && !blocked([r + 1, c], [r, c])) arrow = "↑";
+      let label = "";
+      if (r === P.robot[0] && c === P.robot[1]) label = "R";
+      if (r === P.patient[0] && c === P.patient[1]) label = "P";
+      if (r === P.hospital[0] && c === P.hospital[1]) label = "H";
+      const e = res.expanded[r][c];
+      const t = e / maxE;
+      const bg = isDead ? "" : (e ? `background: rgba(125, 42, 42, ${0.12 + 0.6 * t}); color: ${t > 0.6 ? "#fff" : "inherit"};` : "");
+      html += `<div class="${cls.join(" ")}" style="${bg}" title="(${r},${c}): expanded ${e}×">${arrow ? `<span class="arrow">${arrow}</span>` : ""}<span class="big">${label}</span>${e ? `<span>${e}</span>` : ""}</div>`;
+    }
+    board.innerHTML = html;
+    const ratio = res.steps / baseline.steps;
+    stats.innerHTML =
+      `<p><strong>${res.steps}</strong> calls to <code>problem.step</code> (this is <code>num_steps</code>)</p>` +
+      `<p>Path cost: <strong>${res.cost}</strong> ${res.cost === baseline.cost ? "(optimal)" : "(not optimal)"}</p>` +
+      `<p>${sel.value === "zero" ? "This is the baseline." : `That's ${(ratio * 100).toFixed(0)}% of the h = 0 baseline (${baseline.steps}).`}</p>` +
+      `<p class="plain">${sel.value === "double"
+        ? "Doubling the heuristic overestimates, so optimality is no longer guaranteed. This maze has essentially one route, so the cost may still be optimal. That's luck, not a guarantee."
+        : sel.value === "zero"
+          ? "With h = 0, it expands every reachable state whose cost is below the goal's, in both the not-carrying and carrying layers."
+          : "Admissible, so the path cost matches the baseline. Only the work changes."}</p>`;
+  };
+  sel.addEventListener("change", paint);
+  paint();
+}
+
+function setupFire() {
+  const tIn = document.getElementById("fire-t");
+  const wIn = document.getElementById("fire-w");
+  const marg = document.getElementById("fire-marg");
+  const samp = document.getElementById("fire-samp");
+  const stats = document.getElementById("fire-stats");
+  marg.style.gridTemplateColumns = "repeat(4, auto)";
+  samp.style.gridTemplateColumns = "repeat(4, auto)";
+  let seed = 7;
+  let M = null, S = null, kind = null;
+  const rebuild = () => {
+    kind = wIn.value;
+    const K = fireKernel(kind);
+    M = marginals(80, K);
+    const rng = mulberry32(seed);
+    S = [justWaitFire()];
+    for (let t = 0; t < 80; t++) {
+      const d = fireDist(S[t], K);
+      S.push(d.map((row) => row.map((p) => (rng() < p ? 1 : 0))));
+    }
+  };
+  const label = (r, c) => (r === 0 && c === 1 ? "R" : r === 7 && c === 0 ? "P" : r === 0 && c === 3 ? "H" : "");
+  const paint = () => {
+    const t = Number(tIn.value);
+    document.getElementById("fire-t-out").textContent = t;
+    let a = "", b = "";
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 4; c++) {
+      const p = M[t][r][c];
+      const ink = p > 0.45 ? "#fff" : "inherit";
+      a += `<div class="c" style="background: rgba(214, 72, 28, ${p.toFixed(3)}); color:${ink}" title="P = ${p.toFixed(4)}"><span class="big">${label(r, c)}</span><span>${p < 0.0005 ? "" : p.toFixed(2)}</span></div>`;
+      const f = S[t][r][c];
+      b += `<div class="c" style="${f ? "background:#c2410c;color:#fff" : ""}"><span class="big">${label(r, c)}</span><span>${f ? "fire" : ""}</span></div>`;
+    }
+    marg.innerHTML = a;
+    samp.innerHTML = b;
+    const mass = M[t].flat().reduce((x, y) => x + y, 0);
+    const live = S[t].flat().reduce((x, y) => x + y, 0);
+    const corridor = M[t].map((row) => row[1]);
+    const peak = Math.max(...corridor);
+    stats.innerHTML =
+      `<p>Expected burning cells: <strong>${mass.toFixed(2)}</strong> <span class="plain">(started at 3)</span></p>` +
+      `<p>Burning cells in this sample: <strong>${live}</strong></p>` +
+      `<p>Highest P(fire) in the left corridor (column 1): <strong>${peak.toFixed(3)}</strong></p>` +
+      `<p class="plain">${kind === "c" ? "With center-only weights, every cell copies itself, so the fire never changes. That's the_circle." : "Move t forward: expected fire decreases as it leaks out through the edges, and the corridor risk rises, peaks, and then falls."}</p>`;
+  };
+  tIn.addEventListener("input", paint);
+  wIn.addEventListener("change", () => { rebuild(); paint(); });
+  document.getElementById("fire-resample").addEventListener("click", () => { seed = (Math.random() * 1e9) | 0; rebuild(); paint(); });
+  rebuild();
+  paint();
+}
+
+function setupLogCost() {
+  const ids = ["lc-1", "lc-2", "lc-3"];
+  const table = document.getElementById("lc-table");
+  const summary = document.getElementById("lc-summary");
+  const c = 1e-6;
+  const paint = () => {
+    const ps = ids.map((id) => Number(document.getElementById(id).value));
+    ids.forEach((id, i) => { document.getElementById(id + "-out").textContent = ps[i].toFixed(2); });
+    let total = 0, prod = 1;
+    const rows = ps.map((p, i) => {
+      const cost = c - Math.log(1 - p);
+      total += cost; prod *= 1 - p;
+      return `<tr><td>step ${i + 1}</td><td class="num">${p.toFixed(2)}</td><td class="num">${(1 - p).toFixed(2)}</td><td class="num">${cost.toFixed(4)}</td></tr>`;
+    });
+    table.innerHTML = `<thead><tr><th>step</th><th class="num">p</th><th class="num">1 − p</th><th class="num">cost = c − log(1 − p)</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+    summary.innerHTML = `Total cost <strong>${total.toFixed(4)}</strong>; exp(−total) = <strong>${Math.exp(-total).toFixed(4)}</strong>; ∏(1 − p) = <strong>${prod.toFixed(4)}</strong>. These agree up to the tiny c term, so the cheapest path is the one most likely to survive.`;
+  };
+  ids.forEach((id) => document.getElementById(id).addEventListener("input", paint));
+  paint();
+}
+
+function setupWait() {
+  const K = fireKernel("20");
+  const W = 120;
+  const M = marginals(W + JW_ROUTE.length + 2, K);
+  const est = [];
+  for (let w = 0; w <= W; w++) est.push(routeSurvival(M, w));
+  const sim = [[0, 0.5], [5, 0.521], [10, 0.564], [20, 0.673], [30, 0.739], [40, 0.787], [60, 0.864], [80, 0.916], [100, 0.947]];
+  const w = 560, h = 250, L = 46, R = 14, T = 12, B = 38;
+  const x = (v) => L + (v / W) * (w - L - R);
+  const y = (v) => T + (1 - v) * (h - T - B);
+  const css = getComputedStyle(document.documentElement);
+  const ink = css.getPropertyValue("--ink").trim();
+  const muted = css.getPropertyValue("--muted").trim();
+  const line = css.getPropertyValue("--line").trim();
+  const ox = css.getPropertyValue("--oxblood").trim();
+  const sl = css.getPropertyValue("--slate").trim();
+  let g = "";
+  [0, 0.25, 0.5, 0.75, 1].forEach((v) => {
+    g += `<line x1="${L}" x2="${w - R}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/>`;
+    g += `<text x="${L - 6}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="${muted}">${v.toFixed(2)}</text>`;
+  });
+  [0, 20, 40, 60, 80, 100, 120].forEach((v) => {
+    g += `<text x="${x(v)}" y="${h - B + 16}" text-anchor="middle" font-size="11" fill="${muted}">${v}</text>`;
+  });
+  g += `<text x="${(L + w - R) / 2}" y="${h - 4}" text-anchor="middle" font-size="12" fill="${ink}">steps waited in the top row before entering the corridor</text>`;
+  g += `<text transform="translate(12 ${(T + h - B) / 2}) rotate(-90)" text-anchor="middle" font-size="12" fill="${ink}">P(survive route)</text>`;
+  g += `<polyline fill="none" stroke="${ox}" stroke-width="2.2" points="${est.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}"/>`;
+  sim.forEach(([a, b]) => { g += `<circle cx="${x(a)}" cy="${y(b)}" r="4" fill="${sl}"><title>simulated, wait ${a}: ${b}</title></circle>`; });
+  g += `<line x1="${w - 190}" x2="${w - 170}" y1="${h - B - 40}" y2="${h - B - 40}" stroke="${ox}" stroke-width="2.2"/><text x="${w - 164}" y="${h - B - 36}" font-size="11" fill="${ink}">determinized estimate</text>`;
+  g += `<circle cx="${w - 180}" cy="${h - B - 22}" r="4" fill="${sl}"/><text x="${w - 164}" y="${h - B - 18}" font-size="11" fill="${ink}">simulated truth</text>`;
+  document.getElementById("wait-chart").innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Survival probability rises with waiting time; the determinized estimate sits below the simulated truth">${g}</svg>`;
+  let minW = 0;
+  est.forEach((v, i) => { if (v < est[minW]) minW = i; });
+  document.getElementById("wait-read").textContent =
+    `Estimate at w = 0: ${est[0].toFixed(3)}; lowest at w = ${minW}: ${est[minW].toFixed(3)}; at w = 40: ${est[40].toFixed(3)}; at w = 100: ${est[100].toFixed(3)}. ` +
+    `Waiting 40 laps costs only 40 × 1e-6 in the determinized model, which is why the planner waits.`;
+}
+
+function setupChoice() {
+  const ids = ["ch-k", "ch-q", "ch-m", "ch-p"];
+  const paint = () => {
+    const [k, q, m, p] = ids.map((id) => Number(document.getElementById(id).value));
+    document.getElementById("ch-k-out").textContent = k;
+    document.getElementById("ch-q-out").textContent = q.toFixed(2);
+    document.getElementById("ch-m-out").textContent = m;
+    document.getElementById("ch-p-out").textContent = p.toFixed(2);
+    const corr = Math.pow(1 - q, k);
+    const roomOpen = 1 - p;
+    const roomClosed = 1 - Math.pow(p, m);
+    const openPick = corr >= roomOpen ? "corridor" : "room";
+    const closedPick = corr >= roomClosed ? "corridor" : "room";
+    document.getElementById("ch-table").innerHTML =
+      `<thead><tr><th>Option</th><th class="num">Open-loop score</th><th class="num">Closed-loop value</th></tr></thead><tbody>` +
+      `<tr><td>Corridor (down)</td><td class="num">(1 − q)<sup>k</sup> = ${corr.toFixed(3)}</td><td class="num">${corr.toFixed(3)}</td></tr>` +
+      `<tr><td>Room (right)</td><td class="num">1 − p = ${roomOpen.toFixed(3)}</td><td class="num">1 − p<sup>m</sup> = ${roomClosed.toFixed(3)}</td></tr></tbody>`;
+    document.getElementById("ch-summary").innerHTML =
+      `Open-loop (determinized) chooses: <span class="pick">${openPick}</span>. Closed-loop chooses: <span class="pick">${closedPick}</span>. ` +
+      (openPick !== closedPick
+        ? "They disagree. The gap between 1 − p and 1 − p<sup>m</sup> is the option value the determinized planner can't see."
+        : "They agree here. Try raising p or m to see the disagreement.");
+  };
+  ids.forEach((id) => document.getElementById(id).addEventListener("input", paint));
+  paint();
+}
+
+function setupUCB() {
+  const acts = [
+    { a: "up", U: 1.2, N: 4 },
+    { a: "down", U: -2.5, N: 6 },
+    { a: "left", U: 0.3, N: 1 },
+    { a: "right", U: 4.2, N: 9 }
+  ];
+  const table = document.getElementById("ucb-table");
+  const summary = document.getElementById("ucb-summary");
+  const cIn = document.getElementById("ucb-c");
+  table.innerHTML = `<thead><tr><th>action</th><th class="num">U</th><th class="num">N</th><th class="num">U/N</th><th class="num">bonus</th><th class="num">UCB</th></tr></thead><tbody>` +
+    acts.map((r, i) => `<tr><td>${r.a}</td><td class="num"><input type="number" step="0.1" value="${r.U}" data-i="${i}" data-f="U" style="width:4.5rem"></td><td class="num"><input type="number" step="1" min="0" value="${r.N}" data-i="${i}" data-f="N" style="width:3.8rem"></td><td class="num" id="ucb-m-${i}"></td><td class="num" id="ucb-b-${i}"></td><td class="num" id="ucb-u-${i}"></td></tr>`).join("") + `</tbody>`;
+  const paint = () => {
+    const C = Number(cIn.value);
+    document.getElementById("ucb-c-out").textContent = C.toFixed(2);
+    const parentN = acts.reduce((s, r) => s + r.N, 0);
+    let best = -1, bestV = -Infinity;
+    acts.forEach((r, i) => {
+      const mean = r.N === 0 ? null : r.U / r.N;
+      const bonus = r.N === 0 ? Infinity : C * Math.sqrt(Math.log(Math.max(parentN, 1)) / r.N);
+      const u = r.N === 0 ? Infinity : mean + bonus;
+      document.getElementById(`ucb-m-${i}`).textContent = mean === null ? "—" : mean.toFixed(3);
+      document.getElementById(`ucb-b-${i}`).textContent = bonus === Infinity ? "∞" : bonus.toFixed(3);
+      document.getElementById(`ucb-u-${i}`).textContent = u === Infinity ? "∞" : u.toFixed(3);
+      if (u > bestV) { bestV = u; best = i; }
+    });
+    const greedy = acts.reduce((bi, r, i) => (r.N > 0 && (bi < 0 || r.U / r.N > acts[bi].U / acts[bi].N) ? i : bi), -1);
+    summary.innerHTML = `N(parent) = ${parentN}. UCB selects <span class="pick">${acts[best].a}</span>` +
+      (greedy >= 0 && greedy !== best ? `, even though <strong>${acts[greedy].a}</strong> has the best average. That's the exploration term at work.` : ". It also has the best average, so exploring and exploiting agree here.") +
+      ` Try C = 0 (pure exploitation) and C = 3.`;
+  };
+  table.querySelectorAll("input").forEach((inp) => inp.addEventListener("input", () => {
+    const v = Number(inp.value);
+    acts[Number(inp.dataset.i)][inp.dataset.f] = inp.dataset.f === "N" ? Math.max(0, Math.round(v)) : v;
+    paint();
+  }));
+  cIn.addEventListener("input", paint);
+  paint();
+}
+</script>
+</body>
+</html>

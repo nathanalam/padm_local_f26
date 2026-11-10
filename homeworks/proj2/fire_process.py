@@ -25,7 +25,8 @@ class FireProcess:
 
     initial_fire_grid: np.ndarray
 
-    fire_weights: np.ndarray = np.array([[0, 1, 0], [1, 4, 1], [0, 1, 0]])
+    fire_weights: np.ndarray = dataclasses.field(
+        default_factory=lambda: np.array([[0, 1, 0], [1, 4, 1], [0, 1, 0]]))
     attenuation: float = 1.0
 
     rng: np.random.Generator = dataclasses.field(

@@ -1,0 +1,21 @@
+[project]
+name = "proj2"
+version = "0.1.0"
+description = "Propositional logic homework"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "imageio-ffmpeg>=0.8.1",
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.6.4",
+    "matplotlib>=3.11.2",
+    "numpy>=2.1.0",
+    "principles-of-autonomy",
+    "pyperplan>=2.1",
+    "scipy>=1.18.1",
+    "sympy>=1.14.0",
+    "tqdm>=4.70.1",
+]
+
+[tool.uv.sources]
+principles-of-autonomy = { path = "../.." }
