@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS8 study guide — probability and Bayes nets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,460;8..60,600&family=Source+Sans+3:wght@420;560;680&family=Source+Code+Pro:wght@450;560&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3efe4;
+    --sheet: #faf7f0;
+    --ink: #1d1a16;
+    --muted: #5e574c;
+    --line: #ddd4c3;
+    --oxblood: #7d2a2a;
+    --oxblood-soft: #f3e4dc;
+    --pine: #1e5c45;
+    --pine-soft: #e4f0ea;
+    --gold: #8a5a12;
+    --gold-soft: #f8efd8;
+    --code: #241f1b;
+    --code-ink: #f6efe2;
+    --shadow: 0 1px 0 rgba(29, 26, 22, 0.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgba(125, 42, 42, 0.08), transparent 50%),
+      var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(243, 239, 228, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner, main { width: min(52rem, calc(100% - 2rem)); margin: 0 auto; }
+  .eyebrow {
+    margin: 0.85rem 0 0.15rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    font-weight: 680;
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.85rem;
+    line-height: 1.15;
+    margin: 0 0 0.7rem;
+  }
+  nav.jumps {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.75rem;
+  }
+  nav.jumps a {
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--sheet);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.86rem;
+  }
+  nav.jumps a:hover, nav.jumps a:focus-visible { border-color: var(--oxblood); color: var(--oxblood); }
+  main { padding: 1.4rem 0 4rem; }
+  section {
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--oxblood);
+    box-shadow: var(--shadow);
+    padding: 1.15rem 1.25rem 1.25rem;
+    margin: 0 0 1rem;
+    scroll-margin-top: 7.5rem;
+  }
+  section.shared { border-left-color: var(--pine); }
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+  }
+  h3 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.12rem;
+    margin: 1.15rem 0 0.35rem;
+  }
+  p { margin: 0.45rem 0; }
+  .kicker { color: var(--muted); font-size: 0.92rem; margin: 0 0 0.6rem; }
+  .eq {
+    background: #efe8d8;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+    overflow-x: auto;
+  }
+  .plain { color: var(--muted); font-size: 0.95rem; }
+  code, .mono {
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.86em;
+  }
+  pre {
+    background: var(--code);
+    color: var(--code-ink);
+    padding: 0.8rem 0.95rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.45;
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.82rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.95rem;
+  }
+  th, td { text-align: left; padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 680; }
+  .note, .hint, .lecture {
+    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    margin: 0.55rem 0;
+  }
+  .note { background: var(--pine-soft); }
+  .lecture { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .hint { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .hint[hidden] { display: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; margin: 0.4rem 0; }
+  button {
+    font: inherit;
+    background: var(--ink);
+    color: var(--sheet);
+    border: 0;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+  }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button:hover { background: var(--oxblood); }
+  button.ghost:hover { background: var(--oxblood-soft); color: var(--oxblood); }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--oxblood); outline-offset: 2px; }
+  .muted { color: var(--muted); }
+  ul, ol { margin: 0.35rem 0 0.35rem 1.15rem; padding: 0; }
+  li { margin: 0.2rem 0; }
+  .sig {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.82rem;
+    background: #efe8d8;
+    padding: 0.45rem 0.6rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  .bn {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(4rem, 1fr));
+    gap: 0.55rem 1rem;
+    justify-items: center;
+    margin: 0.8rem 0;
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.85rem;
+  }
+  .bn .node {
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    width: 2.6rem;
+    height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+  }
+  .bn .arrow { color: var(--muted); align-self: center; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <p class="eyebrow">16.410 · Problem Set 8</p>
+    <h1>PS8 study guide: probability and Bayes nets</h1>
+    <nav class="jumps" aria-label="Problems">
+      <a href="#setup">Setup</a>
+      <a href="#lectures">Lectures</a>
+      <a href="#p1a">1A</a>
+      <a href="#p1b">1B</a>
+      <a href="#p2a">2A</a>
+      <a href="#p2b">2B</a>
+      <a href="#p3a">3A</a>
+      <a href="#p3b">3B</a>
+      <a href="#p3c">3C</a>
+      <a href="#p4">4</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="shared" id="setup">
+    <h2>Overview</h2>
+    <ul>
+      <li><strong>Problem 1:</strong> Probability axioms, conditioning, and a small commute model (Bayes rule + total probability).</li>
+      <li><strong>Problem 2:</strong> Read and write Bayes-net factorizations; multiply / marginalize factors; reverse an arc; write an inference expression.</li>
+      <li><strong>Problem 3:</strong> Implement factor multiply, marginalize, and a tiny two-node inference using the provided <code>RV</code> / <code>CPT</code> classes.</li>
+      <li><strong>Problem 4:</strong> Recover a minimal DAG whose factorization matches <code>hidden_joint.npy</code> (AI-enabled).</li>
+    </ul>
+    <p>Work in <code>ProblemSet08_BN_release.ipynb</code>. A filled reference copy lives in <code>ProblemSet08_BN_complete.ipynb</code> — use it to check your work, not as a substitute for deriving the answers.</p>
+    <p class="plain">Run locally from the repo root with <code>bash start_docker.sh ps8</code>.</p>
+
+    <h3>Notation cheat sheet</h3>
+    <table>
+      <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>P(A, B)</code></td><td>Joint probability of A and B.</td></tr>
+        <tr><td><code>P(A | B)</code></td><td>Conditional: probability of A given B.</td></tr>
+        <tr><td><code>P(A) = Σ<sub>b</sub> P(A, b)</code></td><td>Marginalize (sum out) B.</td></tr>
+        <tr><td><code>P(A | B) = P(A, B) / P(B)</code></td><td>Definition of conditioning.</td></tr>
+        <tr><td><code>P(A | B) = P(B | A)P(A) / P(B)</code></td><td>Bayes' rule.</td></tr>
+        <tr><td>CPT / factor</td><td>A multi-dimensional table of (possibly unnormalized) values over some RVs.</td></tr>
+        <tr><td>Join / multiply</td><td>Pointwise product of two factors on the union of their variables (Lecture 17).</td></tr>
+        <tr><td>Eliminate / marginalize</td><td>Sum a factor over one or more variables to shrink it (Lecture 17).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="shared" id="lectures">
+    <h2>How Lecture 16 &amp; 17 map onto this pset</h2>
+    <div class="lecture">
+      <strong>Lecture 16 — Bayes' Nets (representation).</strong>
+      Nodes + directed edges + one CPT per node. The joint is the product of local CPTs.
+      Conditional independence / d-separation tells you which edges you need (and which you can drop).
+      Arc reversal: you can reverse an edge if you update the CPTs so the same joint is represented.
+    </div>
+    <div class="lecture">
+      <strong>Lecture 17 — Exact inference.</strong>
+      Inference by enumeration vs variable elimination. Factors, join (multiply), eliminate (sum out), then normalize.
+      Evidence is encoded by selecting / multiplying in a 0-1 evidence factor. That is exactly what Problem 3 implements.
+    </div>
+    <table>
+      <thead><tr><th>Pset part</th><th>Primary lecture pages / ideas</th></tr></thead>
+      <tbody>
+        <tr><td>1A–1B</td><td>Prerequisite probability (definition of conditioning, Bayes, total probability). Lecture 16/17 assume this fluency.</td></tr>
+        <tr><td>2A Aircraft</td><td>L16: BN semantics, joint = ∏ local CPTs, size of the joint (2<sup>n</sup> for binary vars).</td></tr>
+        <tr><td>2B Factors / arc reverse / query</td><td>L17 Factor Zoo + join/eliminate; L16 arc reversal / causality slides; L17 inference-by-enumeration expression.</td></tr>
+        <tr><td>3A–3C Code</td><td>L17 Operation 1 (Join Factors) and Operation 2 (Eliminate), then normalize.</td></tr>
+        <tr><td>4 Minimal BN</td><td>L16 conditional independence semantics and d-separation: edges encode exactly the CI structure of the joint.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="p1a">
+    <h2>1A · Axioms of probability</h2>
+    <p class="kicker">10 points · probability prerequisites (used throughout L16–L17)</p>
+
+    <h3>Question 1 — expressions equal to P(A=0 | B=0)</h3>
+    <p>Start from the definition and from Bayes' rule, then rewrite the denominator with the law of total probability.</p>
+    <div class="eq">
+      P(A=0 | B=0) = P(A=0, B=0) / P(B=0)<br>
+      = P(B=0 | A=0) P(A=0) / P(B=0)<br>
+      P(B=0) = P(A=0, B=0) + P(A=1, B=0)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= P(B=0 | A=0)P(A=0) + P(B=0 | A=1)P(A=1)
+    </div>
+    <p>Check each option against those identities. Discard anything that divides by P(A=0) instead of P(B=0), or that drops a required term.</p>
+    <div class="hints" data-hints="p1a1">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1.</strong> Options that equal the definition (joint over marginal of B) or Bayes' rule with a correctly expanded P(B=0) are keepers.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2.</strong> P(A,B)/P(A) is P(B|A), not P(A|B). P(B|A)P(A) is the joint, not the conditional. P(B|A) alone drops the prior.
+      </div>
+    </div>
+
+    <h3>Question 2 — always-true statements</h3>
+    <ul>
+      <li>The joint P(A=1, B=1) cannot exceed the marginal P(A=1).</li>
+      <li>For binary B: P(A=1) = P(A=1,B=1) + P(A=1,B=0) (partition).</li>
+      <li>Independence P(A,B)=P(A)P(B) is <em>not</em> always true.</li>
+      <li>P(A|B) ≥ P(A) is not always true (evidence can raise or lower a probability).</li>
+      <li>P(A=1 | B=1) = P(A=1,B=1)/P(B=1) ≥ P(A=1,B=1) because P(B=1) ≤ 1.</li>
+    </ul>
+  </section>
+
+  <section id="p1b">
+    <h2>1B · Travel-time model</h2>
+    <p class="kicker">20 points · joints, conditionals, Bayes rule</p>
+    <p>The L/T table sums to 1, so it is the <strong>joint</strong> P(L, T):</p>
+    <table>
+      <thead><tr><th></th><th>T=1</th><th>T=0</th></tr></thead>
+      <tbody>
+        <tr><th>L=1</th><td>0.70</td><td>0.10</td></tr>
+        <tr><th>L=0</th><td>0.06</td><td>0.14</td></tr>
+      </tbody>
+    </table>
+    <div class="eq">
+      P(L=1) = 0.70 + 0.10<br>
+      P(T=1 | L=1) = 0.70 / P(L=1)<br>
+      P(T=1) = 0.70 + 0.06<br>
+      P(T=1 | G=1) = P(G=1 | T=1) P(T=1) / P(G=1)<br>
+      P(G=1) = P(G=1|T=1)P(T=1) + P(G=1|T=0)P(T=0)
+    </div>
+    <div class="note">
+      G depends on T only. That is a tiny Bayes net T → G (Lecture 16 traffic examples). Use Bayes' rule with the already-computed P(T).
+    </div>
+  </section>
+
+  <section id="p2a">
+    <h2>2A · Aircraft Bayes net</h2>
+    <p class="kicker">10 points · Lecture 16 BN semantics</p>
+    <p>Binary variables A, N, S ⇒ the full joint table has <code>2³ = 8</code> rows (Lecture 16 “Size of a Bayes Net”).</p>
+    <div class="lecture">
+      Lecture 16: a Bayes net encodes
+      <code>P(A, N, S) = P(A) P(N) P(S | A, N)</code>
+      because A and N are roots (no parents) and both point to S.
+    </div>
+    <div class="eq">
+      P(A=T, N=T, S=F) = P(A=T) P(N=T) P(S=F | A=T, N=T)<br>
+      P(S=T) = Σ<sub>a,n</sub> P(A=a) P(N=n) P(S=T | A=a, N=n)
+    </div>
+    <p>Read P(S=T | ·) from the figure; use <code>1 − P(S=T | ·)</code> when you need S=F. Sum over all four (A,N) pairs for the stall marginal.</p>
+  </section>
+
+  <section id="p2b">
+    <h2>2B · Satellite factors, arc reversal, inference</h2>
+    <p class="kicker">20 points · Lecture 16 topology + Lecture 17 factors</p>
+
+    <h3>Factor multiply and marginalize (q10–q11)</h3>
+    <p>You are given an evidence factor that forces D=T, <code>P(D)=[F↦0, T↦1]</code>, and the CPT <code>P(D|E)</code>. Lecture 17 “Join Factors”: for every assignment, multiply the matching entries.</p>
+    <div class="eq">
+      unnormalized P(D, E) entry = evidence(D) × P(D | E)<br>
+      Then sum out D to get a 2-entry factor over E (Lecture 17 “Eliminate”).
+    </div>
+    <div class="note">These factors are <em>not</em> yet normalized posteriors — the problem says so explicitly. Do not divide by a prior on E.</div>
+
+    <h3>Arc reversal C ← E  (q12)</h3>
+    <div class="lecture">
+      Lecture 16 “Reverse Traffic” / causality: you may reverse an arrow if you replace the CPTs so the joint stays the same.
+      Originally the net has parents(E) = {B, S} and parents(C) = {E}.
+      After reversing E → C into C → E, C becomes a root (needs P(C)) and E gains C as an extra parent, so you need P(E | B, S, C).
+    </div>
+    <p>You do <strong>not</strong> need a new table for D; D still depends only on E.</p>
+
+    <h3>Inference expression for P(E=T | D=T, C=T) (q13)</h3>
+    <p>Lecture 17 inference by enumeration / VE in equations:</p>
+    <div class="eq">
+      P(E=T | D=T, C=T) ∝ P(D=T | E=T) P(C=T | E=T)<br>
+      &nbsp;&nbsp;× Σ<sub>B</sub> Σ<sub>S</sub> P(E=T | B, S) P(B) P(S)
+    </div>
+    <p>Sum out the hidden parents of E; keep the evidence CPTs for D and C evaluated at the observed values. Watch for options that sum over D or C (those destroy the evidence) or that treat P(E|B,S) as if B and S were fixed without summing.</p>
+  </section>
+
+  <section id="p3a">
+    <h2>3A · CPT warmups</h2>
+    <p class="kicker">10 points · get comfortable with <code>RV</code> / <code>CPT</code></p>
+    <p class="sig">BN_warmup() → CPT &nbsp;·&nbsp; BN_warmup2(ab_table) → float</p>
+    <ol>
+      <li>Build two RVs <code>Rain</code> and <code>Clouds</code> with domains <code>[0, 1]</code>.</li>
+      <li>Make a 2×2 numpy array whose axes match the RV order you pass to <code>CPT</code>. If RVs are <code>[Rain, Clouds]</code>, then <code>table[rain, clouds]</code> holds the value.</li>
+      <li>For the query helper, call <code>ab_table.get_by_names({"A": 0, "B": 1})</code> (or the equivalent <code>get</code> / <code>get_by_rvs</code>).</li>
+    </ol>
+  </section>
+
+  <section id="p3b">
+    <h2>3B · Multiply and marginalize</h2>
+    <p class="kicker">10 points · Lecture 17 join + eliminate</p>
+    <p class="sig">multiply_tables(tables) → CPT &nbsp;·&nbsp; marginalize(table, rvs) → CPT</p>
+
+    <h3>multiply_tables</h3>
+    <p>Lecture 17 Operation 1: the result is a factor over the <strong>union</strong> of all RVs. For every joint assignment of that union, multiply the value each input CPT contributes on its own variables.</p>
+    <pre>all_rvs = unique RVs across tables (preserve order)
+result table = ones(shape of all_rvs)
+for assignment in iter_joint_values(all_rvs):
+    value = 1
+    for table in tables:
+        value *= table.get(get_sub_assignment(all_rvs, assignment, table.rvs))
+    result.set(assignment, value)</pre>
+    <div class="note">Use the helpers already in the notebook: <code>iter_joint_values</code> and <code>get_sub_assignment</code>. Do not normalize.</div>
+
+    <h3>marginalize</h3>
+    <p>Lecture 17 Operation 2: sum the numpy array along the axes of the RVs you are removing.</p>
+    <pre>axes = tuple(table.rvs.index(rv) for rv in rvs)
+new_table = table.table.sum(axis=axes)
+new_rvs = [rv for rv in table.rvs if rv not in rvs]
+return CPT(new_rvs, new_table)</pre>
+  </section>
+
+  <section id="p3c">
+    <h2>3C · Tiny inference</h2>
+    <p class="kicker">10 points · Lecture 17 evidence + normalize</p>
+    <p class="sig">is_it_cloudy(rain_model, evidence) → CPT over Clouds</p>
+    <p>This is one step of variable elimination on a two-node net:</p>
+    <ol>
+      <li><strong>Join</strong> the rain/clouds model with the evidence factor over Rain.</li>
+      <li><strong>Eliminate</strong> Rain (sum it out).</li>
+      <li><strong>Normalize</strong> so the Clouds factor sums to 1 (required on this question).</li>
+    </ol>
+    <div class="eq">
+      marginal = normalize( marginalize( multiply(rain_model, evidence), {Rain} ) )
+    </div>
+    <div class="hints" data-hints="p3c">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1.</strong> Find the Rain RV with <code>next(rv for rv in joint.rvs if rv.name == "Rain")</code>, then pass <code>{rain_rv}</code> to <code>marginalize</code>.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2.</strong> Normalize with <code>marginal.table = marginal.table / marginal.table.sum()</code>. Evidence <code>[1, 0]</code> means Rain=0 observed.
+      </div>
+    </div>
+  </section>
+
+  <section id="p4">
+    <h2>4 · Recover a minimal Bayes net</h2>
+    <p class="kicker">5 points · AI-enabled · Lecture 16 conditional independence</p>
+    <p>You are given the exact joint over X1…X10 in <code>hidden_joint.npy</code>. Find a DAG with <strong>12 edges</strong> whose BN factorization reproduces that joint.</p>
+
+    <div class="lecture">
+      Lecture 16: the graph’s missing edges are conditional independences.
+      X ⊥ Y | Z holds in the distribution iff P(X,Y|Z) = P(X|Z)P(Y|Z)
+      (up to floating-point noise ~1e−15 on this exact table).
+    </div>
+
+    <h3>Suggested workflow (have an LLM help write the code)</h3>
+    <ol>
+      <li><strong>Skeleton (undirected edges).</strong> Start from the complete graph. Remove an edge X–Y when you find any conditioning set Z (among current neighbors) that makes X ⊥ Y | Z. This is the PC-algorithm idea from CI testing.</li>
+      <li><strong>Orient v-structures.</strong> For an unshielded triple X – Z – Y (no X–Y edge), if Z was <em>not</em> in the separator that removed X–Y, orient X → Z ← Y (collider).</li>
+      <li><strong>Propagate orientations</strong> with Meek-style rules (or try the few remaining undirected edges both ways) so the graph stays a DAG.</li>
+      <li><strong>Verify.</strong> For each node, estimate P(X<sub>i</sub> | Pa<sub>i</sub>) from the joint, multiply those CPTs, and check <code>np.allclose</code> against <code>hidden_joint</code>.</li>
+    </ol>
+    <div class="note">
+      Submit only the edge list in <code>q19_answer</code>. Comment out slow scratch code before Gradescope upload.
+      Several DAGs with the same skeleton but different reversible arrows can be correct.
+    </div>
+    <div class="hints" data-hints="p4">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 1.</strong> Domains are small but the joint has &gt;10⁵ entries — never paste the table into chat. Write numpy CI tests instead.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 2.</strong> After order-0/1/2/3 conditioning, you should land on exactly 12 undirected edges. If you have more, your CI test’s broadcasting is probably wrong.
+      </div>
+      <div class="hint" hidden>
+        <strong>Hint 3.</strong> Unconditional independences include pairs like (X1,X6), (X6,X8), (X8,X9), (X9,X10). Colliders involving X2 and X4 are a good place to start orientations.
+      </div>
+    </div>
+  </section>
+
+  <section class="shared">
+    <h2>Quick checklist before submitting</h2>
+    <ul>
+      <li>All <code>raise NotImplementedError()</code> lines removed from answer cells you filled.</li>
+      <li>Tuples/lists use the requested types (ints for multiple choice, floats for probabilities).</li>
+      <li>Problem 3 returns real <code>CPT</code> objects; inference CPT is normalized.</li>
+      <li>Problem 4 has exactly 12 edges and is a DAG over <code>"X1"… "X10"</code>.</li>
+      <li>Form confirmation word pasted; notebook saved; slow scratch commented out.</li>
+    </ul>
+  </section>
+</main>
+<script>
+  document.querySelectorAll(".hints").forEach((root) => {
+    const hints = [...root.querySelectorAll(".hint")];
+    const next = root.querySelector(".hint-next");
+    const reset = root.querySelector(".hint-reset");
+    const count = root.querySelector(".hint-count");
+    let shown = 0;
+    const paint = () => {
+      hints.forEach((h, i) => { h.hidden = i >= shown; });
+      count.textContent = shown === 0 ? "" : `${shown} / ${hints.length} hints`;
+      next.disabled = shown >= hints.length;
+    };
+    next.addEventListener("click", () => { shown = Math.min(hints.length, shown + 1); paint(); });
+    reset.addEventListener("click", () => { shown = 0; paint(); });
+    paint();
+  });
+</script>
+</body>
+</html>

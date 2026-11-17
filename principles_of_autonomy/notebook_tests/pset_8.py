@@ -254,10 +254,101 @@ class TestPSet8(unittest.TestCase):
 
         test_ok()
 
-        
+    @weight(5)
+    @timeout_decorator.timeout(30.0)
+    def test_19_minimal_bn(self):
+        """Check that q19_answer is a DAG with 12 edges that factors hidden_joint."""
+        (q19_answer, hidden_joint, RV, CPT) = get_locals(
+            self.notebook_locals,
+            ["q19_answer", "hidden_joint", "RV", "CPT"],
+        )
+
+        assert isinstance(q19_answer, (list, tuple)), "q19_answer should be a list of edges."
+        assert len(q19_answer) == 12, "The minimal Bayes net has exactly 12 edges."
+
+        var_names = [rv.name for rv in hidden_joint.rvs]
+        name_to_rv = {rv.name: rv for rv in hidden_joint.rvs}
+        assert all(
+            isinstance(e, (list, tuple)) and len(e) == 2 for e in q19_answer
+        ), "Each edge must be a (parent, child) pair."
+        for parent, child in q19_answer:
+            assert parent in name_to_rv and child in name_to_rv, (
+                f"Unknown variable in edge {(parent, child)}. "
+                f"Use names {var_names}."
+            )
+            assert parent != child, "No self-loops allowed."
+
+        # Build parent sets and check DAG via topological sort.
+        parents = {name: [] for name in var_names}
+        children = {name: [] for name in var_names}
+        edge_set = set()
+        for parent, child in q19_answer:
+            edge = (parent, child)
+            assert edge not in edge_set, f"Duplicate edge {edge}."
+            edge_set.add(edge)
+            parents[child].append(parent)
+            children[parent].append(child)
+
+        indeg = {name: len(parents[name]) for name in var_names}
+        queue = [name for name in var_names if indeg[name] == 0]
+        order = []
+        while queue:
+            node = queue.pop()
+            order.append(node)
+            for child in children[node]:
+                indeg[child] -= 1
+                if indeg[child] == 0:
+                    queue.append(child)
+        assert len(order) == len(var_names), "Graph must be a DAG (no directed cycles)."
+
+        # Reconstruct the joint from the BN factorization and compare.
+        joint = hidden_joint.table
+        n = len(var_names)
+        name_to_axis = {rv.name: i for i, rv in enumerate(hidden_joint.rvs)}
+
+        def marginalize_to(axes_keep):
+            out = joint
+            keep = set(axes_keep)
+            for ax in range(n - 1, -1, -1):
+                if ax not in keep:
+                    out = out.sum(axis=ax)
+            remaining = [ax for ax in range(n) if ax in keep]
+            order_axes = [remaining.index(ax) for ax in axes_keep]
+            return np.transpose(out, order_axes) if order_axes else out
+
+        recon = np.ones_like(joint)
+        for name in var_names:
+            axis = name_to_axis[name]
+            pa = parents[name]
+            if not pa:
+                p_i = marginalize_to([axis])
+                shape = [1] * n
+                shape[axis] = joint.shape[axis]
+                recon = recon * p_i.reshape(shape)
+            else:
+                pa_axes = [name_to_axis[p] for p in pa]
+                axes_keep = pa_axes + [axis]
+                p_full = marginalize_to(axes_keep)
+                p_pa = marginalize_to(pa_axes)
+                cpt = p_full / np.maximum(p_pa[..., None], 1e-300)
+                order_sorted = sorted(axes_keep)
+                perm = [axes_keep.index(a) for a in order_sorted]
+                arr_s = np.transpose(cpt, perm)
+                shape = [1] * n
+                for a in order_sorted:
+                    shape[a] = joint.shape[a]
+                recon = recon * arr_s.reshape(shape)
+
+        assert np.allclose(recon, joint, atol=1e-9), (
+            "Bayes net factorization does not reproduce hidden_joint. "
+            "Check edge directions and that the graph encodes the conditional independences."
+        )
+
+        test_ok()
+
     @weight(5)
     @timeout_decorator.timeout(1.0)
-    def test_19_form_word(self):
+    def test_20_form_word(self):
         word = get_locals(self.notebook_locals, ['form_confirmation_word'])
         password_hash = hash("Hotteok".lower()) #to change!!
         if hash(word.strip().lower()) == password_hash:
