@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS9 workalong guide — Gibbs sampling and HMMs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,460;8..60,600&family=Source+Sans+3:wght@420;560;680&family=Source+Code+Pro:wght@450;560&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3efe4;
+    --sheet: #faf7f0;
+    --ink: #1d1a16;
+    --muted: #5e574c;
+    --line: #ddd4c3;
+    --oxblood: #7d2a2a;
+    --oxblood-soft: #f3e4dc;
+    --pine: #1e5c45;
+    --pine-soft: #e4f0ea;
+    --gold: #8a5a12;
+    --gold-soft: #f8efd8;
+    --code: #241f1b;
+    --code-ink: #f6efe2;
+    --shadow: 0 1px 0 rgba(29, 26, 22, 0.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgba(125, 42, 42, 0.08), transparent 50%),
+      var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(243, 239, 228, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner, main { width: min(52rem, calc(100% - 2rem)); margin: 0 auto; }
+  .eyebrow {
+    margin: 0.85rem 0 0.15rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    font-weight: 680;
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.85rem;
+    line-height: 1.15;
+    margin: 0 0 0.7rem;
+  }
+  nav.jumps {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.75rem;
+  }
+  nav.jumps a {
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--sheet);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.86rem;
+  }
+  nav.jumps a:hover, nav.jumps a:focus-visible { border-color: var(--oxblood); color: var(--oxblood); }
+  main { padding: 1.4rem 0 4rem; }
+  section {
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--oxblood);
+    box-shadow: var(--shadow);
+    padding: 1.15rem 1.25rem 1.25rem;
+    margin: 0 0 1rem;
+    scroll-margin-top: 7.5rem;
+  }
+  section.shared { border-left-color: var(--pine); }
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+  }
+  h3 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.12rem;
+    margin: 1.15rem 0 0.35rem;
+  }
+  p { margin: 0.45rem 0; }
+  .kicker { color: var(--muted); font-size: 0.92rem; margin: 0 0 0.6rem; }
+  .eq {
+    background: #efe8d8;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+    overflow-x: auto;
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.88rem;
+  }
+  .plain { color: var(--muted); font-size: 0.95rem; }
+  code, .mono {
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.86em;
+  }
+  pre {
+    background: var(--code);
+    color: var(--code-ink);
+    padding: 0.8rem 0.95rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.45;
+    font-family: "Source Code Pro", ui-monospace, monospace;
+    font-size: 0.82rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0 0.2rem;
+    font-size: 0.95rem;
+  }
+  th, td { text-align: left; padding: 0.4rem 0.45rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 680; }
+  .note, .hint, .lecture, .warn {
+    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    margin: 0.55rem 0;
+  }
+  .note { background: var(--pine-soft); }
+  .lecture { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .hint { background: var(--gold-soft); border: 1px solid #e4d3a8; }
+  .warn { background: var(--oxblood-soft); border: 1px solid #e0c0b5; }
+  .hint[hidden] { display: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; margin: 0.4rem 0; }
+  button {
+    font: inherit;
+    background: var(--ink);
+    color: var(--sheet);
+    border: 0;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button:hover { background: var(--oxblood); }
+  button.ghost:hover { background: var(--oxblood-soft); color: var(--oxblood); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--oxblood); outline-offset: 2px; }
+  .muted { color: var(--muted); }
+  ul, ol { margin: 0.35rem 0 0.35rem 1.15rem; padding: 0; }
+  li { margin: 0.22rem 0; }
+  .sig {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.82rem;
+    background: #efe8d8;
+    padding: 0.45rem 0.6rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  .fig {
+    margin: 0.7rem 0;
+    text-align: center;
+  }
+  .fig img {
+    max-width: 100%;
+    max-height: 280px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    padding: 0.35rem;
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.7rem;
+    margin: 0.6rem 0;
+  }
+  .card {
+    background: #f5efe1;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+  }
+  .card h4 {
+    margin: 0 0 0.3rem;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1rem;
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <p class="eyebrow">16.410 · Problem Set 9</p>
+    <h1>PS9 workalong guide: Gibbs sampling &amp; HMMs</h1>
+    <nav class="jumps" aria-label="Problems">
+      <a href="#setup">Setup</a>
+      <a href="#lectures">Lectures</a>
+      <a href="#p1">1 · Sampling</a>
+      <a href="#p2a">2A</a>
+      <a href="#p2b">2B</a>
+      <a href="#p2c">2C</a>
+      <a href="#p2d">2D</a>
+      <a href="#p2e">2E</a>
+      <a href="#p2f">2F · Viterbi</a>
+      <a href="#p3a">3A · Adversary</a>
+      <a href="#p3b">3B · Explain</a>
+      <a href="#checklist">Checklist</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- SETUP -->
+  <section class="shared" id="setup">
+    <h2>Overview &amp; local setup</h2>
+    <ul>
+      <li><strong>Problem 1 (25 pts):</strong> Gibbs sampling consistency/ergodicity on a 3-node graph, rejection sampling (root vs. leaf evidence), and Markov blankets (Lecture 18).</li>
+      <li><strong>Problem 2 (60 pts):</strong> Build a 2D-grid robot localization HMM (state/observation RVs, transition &amp; noisy observation CPTs) and implement <strong>Viterbi decoding</strong> (Lecture 19).</li>
+      <li><strong>Problem 3 (10 pts):</strong> Construct an adversarial Bayes net where every evidence variable is individually likely (≥ 0.5) yet the joint evidence is rare (≤ 0.005), then explain why in your own words (Lecture 18).</li>
+      <li><strong>Part 4 (5 pts):</strong> Time-spent survey confirmation word.</li>
+    </ul>
+    <p>Work in <code>ProblemSet09_Gibbs_HMMs_release.ipynb</code>. A fully solved reference notebook lives in <code>ProblemSet09_Gibbs_HMMs_complete.ipynb</code> — use it to check your work after deriving each answer yourself.</p>
+    <pre>cd homeworks/ps9
+uv sync
+uv run jupyter lab</pre>
+
+    <h3>Provided HMM / CPT helper cheat sheet</h3>
+    <table>
+      <thead><tr><th>Helper</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>RV(name, domain)</code></td><td>Finite random variable; stores <code>.name</code>, <code>.domain</code> (list/tuple), <code>.dim</code>.</td></tr>
+        <tr><td><code>CPT(rvs, table)</code></td><td>Multi-dimensional table whose axes match <code>rvs</code> in order. Lookup via <code>.get(tuple)</code>, <code>.get_by_rvs(dict)</code>, <code>.get_by_names(dict)</code>.</td></tr>
+        <tr><td><code>condition_CPT(cpt, evidence)</code></td><td>Slices <code>cpt</code> at <code>{rv: val}</code> and drops conditioned RVs from <code>.rvs</code>.</td></tr>
+        <tr><td><code>multiply_CPTs([cpt1, ...])</code></td><td>Pointwise product over the union of RVs across all input CPTs.</td></tr>
+        <tr><td><code>normalize_CPT(cpt)</code></td><td>Divides <code>cpt.table</code> by its total sum so all entries sum to 1.</td></tr>
+        <tr><td><code>max_CPT(cpt, rv=None)</code></td><td>Maximizes out <code>rv</code> (returns a smaller CPT), or returns the global max scalar if <code>rv=None</code>.</td></tr>
+        <tr><td><code>argmax_CPT(cpt, rv=None)</code></td><td>Returns a CPT whose entries are the maximizing domain values of <code>rv</code>, or the global argmax tuple if <code>rv=None</code>.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- LECTURE MAP -->
+  <section class="shared" id="lectures">
+    <h2>How Lectures 18, 19 &amp; 20 map onto this pset</h2>
+    <div class="lecture">
+      <strong>Lecture 18 — Bayes Nets: Approximate Inference (AIMA Ch. 13.1–13.5).</strong>
+      Why sample (fast, <code>O(n)</code> memory, scales where exact inference blows up). Covers the four core sampling algorithms:
+      <strong>Prior Sampling</strong> (s.10–12), <strong>Rejection Sampling</strong> (s.15–18, s.20), <strong>Likelihood Weighting</strong> (s.19–25), and <strong>MCMC / Gibbs Sampling</strong> (s.26–36) including the <strong>Markov blanket</strong> (s.29–31) and <strong>ergodicity / consistency</strong> (s.28, s.36).
+    </div>
+    <div class="lecture">
+      <strong>Lecture 19 — Hidden Markov Models (AIMA Ch. 14.1–14.3).</strong>
+      Markov chains &amp; stationary distributions (s.5–14), HMM formulation with initial/transition/sensor models (s.16–18), the four HMM inference tasks (s.20–21), the <strong>Robot Localization</strong> 4-bit wall-sensor example (s.24–29), the <strong>Forward (Filtering)</strong> algorithm (s.30–34), and <strong>Most Likely Explanation / Viterbi</strong> on a state trellis + negative log space (s.35–41). Also introduces DBNs and Particle Filtering (s.42–53) for large/continuous state spaces.
+    </div>
+    <div class="note">
+      <strong>Note on Lecture 20 (Naïve Bayes &amp; MLE):</strong> Lecture 20 introduces Machine Learning for <strong>PSet 10</strong> (as noted on L20 s.1), so it is not directly tested on PS9 — though its log-likelihood trick (<code>argmax f(θ) = argmax ln f(θ)</code>, L20 s.27 &amp; s.32) is the exact same math behind Viterbi in log space (L19 s.41).
+    </div>
+    <table>
+      <thead><tr><th>Pset part</th><th>Primary lecture slides &amp; concepts</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Q1 (3-node Gibbs)</td><td><strong>L18 s.28, s.36:</strong> Gibbs consistency theorem (<code>Kπ = π</code>) requires an <em>ergodic</em> chain (completely connected &amp; aperiodic; guaranteed when probabilities are bounded away from 0 and 1).</td></tr>
+        <tr><td>1 · Q2–Q3 (Rejection)</td><td><strong>L18 s.11–12, s.16–17, s.20, s.25:</strong> Topological forward sampling with early rejection vs. wasted rollouts on downstream/leaf evidence.</td></tr>
+        <tr><td>1 · Q4–Q5 (Markov Blanket)</td><td><strong>L18 s.29–31:</strong> <code>MB(X) = parents ∪ children ∪ children's parents</code>; local Gibbs update formula.</td></tr>
+        <tr><td>2A–2E (Robot HMM)</td><td><strong>L19 s.5, s.16–18, s.24–29:</strong> First-order Markov + stationarity, HMM triple <code>(P(X₀), P(Xₜ|Xₜ₋₁), P(Eₜ|Xₜ))</code>, and the 4-bit wall/no-wall robot localization sensor model.</td></tr>
+        <tr><td>2F (Viterbi Decoding)</td><td><strong>L19 s.20–21, s.37–41:</strong> Most likely explanation on a state trellis; Forward (sum) vs. Viterbi (max); backpointers, <code>O(|X|²T)</code> time / <code>O(|X|T)</code> space, normalization &amp; log space.</td></tr>
+        <tr><td>3A–3B (Adversarial BN)</td><td><strong>L18 s.12, s.16–17, s.20:</strong> Forward-sampling distribution equals the BN joint <code>∏ P(xᵢ | Parents(Xᵢ))</code>; rejection rate depends on the <em>joint</em> <code>P(E = e)</code>, not individual marginals <code>P(Eᵢ = eᵢ)</code>.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PROBLEM 1 -->
+  <section id="p1">
+    <h2>1 · Sampling</h2>
+    <p class="kicker">25 points · Lecture 18 (Approximate Inference: Rejection &amp; Gibbs Sampling)</p>
+
+    <h3>Q1 — Which CPT breaks Gibbs sampling?</h3>
+    <div class="fig"><img src="3node_Gibbs.png" alt="3-node factor graph X and Y pointing to Z with Tables 1, 2, 3"></div>
+    <div class="lecture">
+      <strong>Lecture 18, Slides 28 &amp; 36 — Consistency of Gibbs Sampling (AIMA 13.4.2):</strong><br>
+      Each Gibbs step picks one variable and resamples it conditioned on all other variables, transitioning state <code>x → x'</code> with kernel <code>k(x' | x)</code>. At equilibrium, <code>π = Kπ</code> has a <strong>unique</strong> stationary solution <code>π = P(x₁,…,xₙ | e₁,…,eₖ)</code> <em>only if the Markov chain is ergodic</em> — i.e., <strong>completely connected (irreducible) and aperiodic</strong>. L18 s.28 &amp; s.36 highlight the sufficient condition: <em>"Provided all Gibbs distributions are bounded away from 0 and 1 and variable selection is fair"</em> (and mixing takes longer when CPTs are nearly deterministic).
+    </div>
+    <p>Inspect each table for zero entries that disconnect positive-probability states into unreachable islands under single-variable updates:</p>
+    <ul>
+      <li><strong>Table 1:</strong> Every <code>(x, y)</code> pair has at least one <code>z</code> with positive probability, so you can always change <code>x</code> or <code>y</code> one at a time.</li>
+      <li><strong>Table 2:</strong> Only <code>(x=T, y=F)</code> and <code>(x=F, y=T)</code> have positive entries; <code>(T, T)</code> and <code>(F, F)</code> are strictly 0 for every <code>z</code>! Starting at <code>(T, F, z)</code>, flipping <code>x</code> moves to <code>(F, F, z)</code> (prob 0) and flipping <code>y</code> moves to <code>(T, T, z)</code> (prob 0). The chain is <strong>reducible</strong> (not completely connected) and can <em>never</em> cross between <code>(T, F)</code> and <code>(F, T)</code>.</li>
+      <li><strong>Table 3:</strong> <code>(T, T)</code>, <code>(T, F)</code>, <code>(F, T)</code>, and <code>(F, F, F)</code> are all positive and connected by single-variable steps.</li>
+    </ul>
+    <div class="hints" data-hints="p1q1">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><strong>Hint 1.</strong> Look for a table where two positive-probability assignments differ in <em>two</em> variables (<code>x</code> and <code>y</code>) and both intermediate states have probability 0, violating ergodicity (L18 s.36).</div>
+      <div class="hint" hidden><strong>Answer.</strong> <code>q1_answer = 2</code>.</div>
+    </div>
+
+    <h3>Q2 &amp; Q3 — Prior sampling with rejection on a DAG</h3>
+    <div class="fig"><img src="sampling_bayes.png" alt="Bayes net with root B and leaf K"></div>
+    <div class="lecture">
+      <strong>Lecture 18, Slides 11, 16–17, 20 &amp; 25 — Prior vs. Rejection Sampling:</strong><br>
+      Prior sampling walks the DAG in <strong>topological order</strong> (<code>for i = 1..n: sample xᵢ ~ P(Xᵢ | parents(Xᵢ))</code>). Rejection sampling adds an early-exit check: <em>"If xᵢ is not consistent with evidence, reject immediately"</em> (L18 s.16–17). Its weakness (L18 s.20): <em>"If evidence is unlikely, rejects lots of samples; evidence not exploited as you sample"</em> — especially severe when evidence sits at <strong>downstream leaf nodes</strong> (just like <code>P(Shape | Color=blue)</code> on L18 s.20 and <code>P(Age | e)</code> vs. <code>P(PropertyCost | e)</code> on L18 s.18, s.33–34).
+    </div>
+    <ul>
+      <li><strong>Q2 — <code>P(K | B = b)</code>:</strong> <code>B</code> is the <strong>root</strong> node. It is sampled first in topological order, so mismatches are rejected immediately before touching any other node — and every accepted rollout naturally propagates the upstream evidence <code>B = b</code> downward to <code>K</code>. Good fit!</li>
+      <li><strong>Q3 — <code>P(B | K = k)</code>:</strong> <code>K</code> is a <strong>leaf</strong> at the very bottom. Every sample must simulate the entire network <code>B → … → K</code> without seeing <code>K = k</code>, then discard the whole rollout whenever <code>K ≠ k</code>. Poor fit! (This is exactly why L18 introduces Likelihood Weighting and Gibbs sampling for downstream evidence.)</li>
+    </ul>
+    <div class="hints" data-hints="p1q23">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><strong>Hint 1.</strong> Evidence at a root (causal direction) lets you reject at step 1; evidence at a leaf (diagnostic direction) wastes full-network rollouts.</div>
+      <div class="hint" hidden><strong>Answer.</strong> <code>q2_answer = 'yes'</code>, <code>q3_answer = 'no'</code>.</div>
+    </div>
+
+    <h3>Q4 &amp; Q5 — Markov blankets of <code>G</code> and <code>D</code></h3>
+    <div class="lecture">
+      <strong>Lecture 18, Slides 29–31 — The Markov Blanket &amp; Gibbs Resampling:</strong><br>
+      Contrast the two independence rules on L18 s.29:
+      <ul>
+        <li>Given its <strong>parents</strong> alone, <code>X</code> is conditionally independent of its <em>non-descendants</em>.</li>
+        <li>Given its <strong>Markov blanket</strong>, <code>X</code> is conditionally independent of <em>all other nodes in the network</em>:
+          <div class="eq">MB(X) = Parents(X) ∪ Children(X) ∪ Children's Parents(X)</div>
+        </li>
+      </ul>
+      That is why a Gibbs step only needs the CPT of <code>X</code> and the CPTs of its children <code>Yⱼ</code> (L18 s.31):
+      <div class="eq">P(Xᵢ | x₋ᵢ) = P(Xᵢ | MB(Xᵢ)) = α · P(Xᵢ | parents(Xᵢ)) · ∏ⱼ P(yⱼ | parents(Yⱼ))</div>
+    </div>
+    <ol>
+      <li><strong>For <code>G</code>:</strong> Parents = <code>{D}</code>; Children = <code>{I}</code>; Other parents of <code>I</code> = <code>∅</code>.</li>
+      <li><strong>For <code>D</code>:</strong> Parents = <code>{B}</code>; Children = <code>{G, H}</code>; Other parents of <code>G</code> = <code>∅</code>; Other parents of <code>H</code> = <code>{E}</code> (since both <code>D → H</code> and <code>E → H</code> meet at collider <code>H</code>).</li>
+    </ol>
+    <div class="hints" data-hints="p1q45">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><strong>Hint 1.</strong> Look closely at node <code>H</code> — it has two incoming arrows, making <code>E</code> a co-parent of <code>D</code> (the <code>Zⱼ</code> nodes in L18 s.29).</div>
+      <div class="hint" hidden><strong>Answer.</strong> <code>q4_answer = ('D', 'I')</code>, <code>q5_answer = ('B', 'E', 'G', 'H')</code>.</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 2A -->
+  <section id="p2a">
+    <h2>2A · Conditioning warmup</h2>
+    <p class="kicker">5 points · 1 line of code · HMM setup</p>
+    <div class="lecture">
+      <strong>Lecture 19, Slides 16–18 — HMM as a Probability Model:</strong><br>
+      An HMM pairs an underlying first-order Markov chain over hidden states <code>Xₜ</code> (in PS9: robot grid position <code>sₜ</code>) with noisy observations <code>Eₜ</code> (in PS9: <code>zₜ</code>). It is completely specified by three distributions:
+      <div class="eq">Initial: P(X₀) &nbsp;·&nbsp; Transition: P(Xₜ | Xₜ₋₁) &nbsp;·&nbsp; Sensor: P(Eₜ | Xₜ)<br>Joint: P(X₀, …, Xₜ, E₁:ₜ) = P(X₀) ∏ₜ P(Xₜ | Xₜ₋₁) P(Eₜ | Xₜ)</div>
+      Conditioning a sensor CPT <code>P(zₜ | sₜ)</code> on an observed reading <code>zₜ = obs</code> produces the likelihood factor over <code>sₜ</code> used in filtering and Viterbi (L19 s.31–33).
+    </div>
+    <div class="sig">def conditioning_warmup(cpt, rv) -&gt; CPT</div>
+    <p>You already have <code>condition_CPT(cpt, evidence)</code> in the utilities cell, where <code>evidence</code> is a dict mapping each conditioned <code>RV</code> to its observed value. Simply pass <code>{rv: 0}</code>.</p>
+    <div class="hints" data-hints="p2a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><code>return condition_CPT(cpt, {rv: 0})</code></div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 2B -->
+  <section id="p2b">
+    <h2>2B · HMM state variable</h2>
+    <p class="kicker">5 points · 2 lines of code · Lecture 19 s.5, s.24–29 (Robot Localization)</p>
+    <div class="lecture">
+      <strong>Lecture 19, Slides 5 &amp; 24–29 — Discrete Finite State Space:</strong><br>
+      In L19's Robot Localization example (Michael Pfeiffer, s.24–29), the robot knows the grid map of walls/obstacles, and its hidden state <code>Xₜ</code> is a discrete finite variable ranging over all <em>free</em> cells in the grid.
+    </div>
+    <div class="sig">def create_state_variable(obstacle_map, name) -&gt; RV</div>
+    <p>Scan <code>obstacle_map</code> in <strong>row-major order</strong> (outer loop over rows <code>r</code>, inner loop over columns <code>c</code>) and collect every <code>(r, c)</code> tuple whose entry is <code>0</code> (free space, not obstacle <code>1</code>). Wrap that list in <code>RV(name, domain)</code>.</p>
+    <div class="hints" data-hints="p2b">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>Use a nested list comprehension: <code>[(r, c) for r, row in enumerate(obstacle_map) for c, val in enumerate(row) if val == 0]</code>.</div>
+      <div class="hint" hidden>Return <code>RV(name, domain)</code>.</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 2C -->
+  <section id="p2c">
+    <h2>2C · Transition CPT</h2>
+    <p class="kicker">5 points · ~8–10 lines of code · Lecture 19 s.5–7 (Transition Model &amp; Stationarity)</p>
+    <div class="lecture">
+      <strong>Lecture 19, Slide 5 — First-Order Markov &amp; Stationarity Assumptions:</strong><br>
+      <strong>Markov assumption:</strong> <em>"future is independent of the past given the present"</em> — <code>P(Xₜ₊₁ | X₀,…,Xₜ) = P(Xₜ₊₁ | Xₜ)</code>. <strong>Stationarity:</strong> the same transition CPT applies at every timestep <code>t</code> (just like an MDP transition model with no choice of action). Each row <code>sₜ</code> of the transition matrix sums to 1 over next states <code>sₜ₊₁</code> (L19 s.7).
+    </div>
+    <div class="sig">def create_transition_cpt(obstacle_map, st, st1) -&gt; CPT</div>
+    <p>From state <code>s_t = (prev_r, prev_c)</code>, the robot moves uniformly among its <strong>current cell</strong> and any <strong>free 4-cardinal neighbors</strong> (up, down, left, right).</p>
+    <div class="note">
+      <strong>Clean shortcut:</strong> Because <code>st1.domain</code> already contains <em>only</em> in-bounds free cells, a state <code>(next_r, next_c)</code> in <code>st1.domain</code> is reachable from <code>(prev_r, prev_c)</code> if and only if its Manhattan distance is at most 1:
+      <div class="eq">|prev_r − next_r| + |prev_c − next_c| ≤ 1</div>
+    </div>
+    <ol>
+      <li>Allocate <code>table = np.zeros((st.dim, st1.dim))</code>.</li>
+      <li>For each <code>i, (prev_r, prev_c)</code> in <code>enumerate(st.domain)</code>, set <code>table[i, j] = 1.0</code> whenever Manhattan distance ≤ 1.</li>
+      <li>Normalize row <code>i</code>: <code>table[i] /= table[i].sum()</code> so each row sums to 1 (valid conditional distribution <code>P(s_{t+1} | s_t)</code>).</li>
+      <li>Return <code>CPT([st, st1], table)</code>.</li>
+    </ol>
+    <div class="hints" data-hints="p2c">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>Remember axis 0 is <code>st</code> (current state) and axis 1 is <code>st1</code> (next state), so <code>table[i, :]</code> sums to 1.</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 2D -->
+  <section id="p2d">
+    <h2>2D · Observation variable</h2>
+    <p class="kicker">5 points · 2 lines of code · Lecture 19 s.16, s.24</p>
+    <div class="lecture">
+      <strong>Lecture 19, Slide 24 — Robot Localization Sensor Reading:</strong><br>
+      <em>"Sensor model: four bits for wall/no-wall in each direction"</em> — in PS9, a 4-tuple <code>(N, E, S, W)</code> where <code>1</code> means obstacle (or off-map) and <code>0</code> means free space, giving <code>2⁴ = 16</code> possible observations.
+    </div>
+    <div class="sig">def create_observation_variable(name) -&gt; RV</div>
+    <div class="hints" data-hints="p2d">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><code>domain = list(itertools.product([0, 1], repeat=4))</code> and return <code>RV(name, domain)</code>.</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 2E -->
+  <section id="p2e">
+    <h2>2E · Observation CPT</h2>
+    <p class="kicker">20 points · Lecture 19 s.17–18, s.24–25 (Noisy Sensor Model)</p>
+    <div class="lecture">
+      <strong>Lecture 19, Slides 18 &amp; 25 — Sensor Model <code>P(Eₜ | Xₜ)</code>:</strong><br>
+      Current evidence <code>Eₜ</code> is conditionally independent of all other states and observations given the current state <code>Xₜ</code>. Just like the lighter-grey cells on L19 s.25 (<em>"possible to get the reading, but less likely (required 1 mistake)"</em>), each bit error reduces the likelihood by a factor of <code>noise_prob / (1 − noise_prob)</code>.
+    </div>
+    <div class="sig">def create_observation_cpt(obstacle_map, state_rv, observation_rv, noise_prob=0.) -&gt; CPT</div>
+    <p>For each state <code>(r, c)</code>, first compute the <strong>true (noise-free)</strong> observation <code>true_obs</code> in exact <code>[N, E, S, W]</code> order:</p>
+    <table>
+      <thead><tr><th>Direction</th><th>Delta <code>(dr, dc)</code></th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>North (N)</td><td><code>(-1, 0)</code></td><td><code>1</code> if off-map, else <code>obstacle_map[r-1][c]</code></td></tr>
+        <tr><td>East (E)</td><td><code>(0, +1)</code></td><td><code>1</code> if off-map, else <code>obstacle_map[r][c+1]</code></td></tr>
+        <tr><td>South (S)</td><td><code>(+1, 0)</code></td><td><code>1</code> if off-map, else <code>obstacle_map[r+1][c]</code></td></tr>
+        <tr><td>West (W)</td><td><code>(0, -1)</code></td><td><code>1</code> if off-map, else <code>obstacle_map[r][c-1]</code></td></tr>
+      </tbody>
+    </table>
+    <p>Each of the 4 sensor bits flips independently with probability <code>p = noise_prob</code>. If an observation <code>obs</code> disagrees with <code>true_obs</code> in <code>k</code> positions (Hamming distance <code>k</code>), then:</p>
+    <div class="eq">P(zₜ = obs | sₜ = (r, c)) = p<sup>k</sup> · (1 − p)<sup>4 − k</sup></div>
+    <div class="note">
+      In Python, <code>0.0 ** 0 == 1.0</code>, so the formula handles <code>noise_prob = 0.0</code> cleanly without any special case: <code>k = 0</code> gives <code>1.0</code>, and any <code>k &gt; 0</code> gives <code>0.0</code>.
+    </div>
+    <div class="hints" data-hints="p2e">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden>Count mismatches with <code>flips = sum(o != t for o, t in zip(obs, true_obs))</code>.</div>
+      <div class="hint" hidden>Double-check the direction order: <code>[(-1, 0), (0, 1), (1, 0), (0, -1)]</code> is <code>[N, E, S, W]</code>. Swapping E and W or N and S is the most common bug!</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 2F -->
+  <section id="p2f">
+    <h2>2F · Viterbi decoding</h2>
+    <p class="kicker">20 points · Lecture 19 s.20–21, s.35–41 (Most Likely Explanation &amp; Viterbi)</p>
+    <div class="lecture">
+      <strong>Lecture 19, Slides 20–21 &amp; 37–41 — Filtering vs. Viterbi on a State Trellis:</strong><br>
+      Of the four HMM inference tasks (<strong>Filtering</strong> <code>P(Xₜ|e₁:ₜ)</code>, <strong>Prediction</strong> <code>P(Xₜ₊ₖ|e₁:ₜ)</code>, <strong>Smoothing</strong> <code>P(Xₖ|e₁:ₜ)</code>, and <strong>Most Likely Explanation</strong> <code>argmax_{x₀:ₜ} P(x₀:ₜ|e₁:ₜ)</code>), Viterbi solves <strong>Most Likely Explanation</strong> — finding the single highest-probability path through the state trellis, where each arc <code>xₜ₋₁ → xₜ</code> has weight <code>P(xₜ|xₜ₋₁)P(eₜ|xₜ)</code> (L19 s.37):
+      <div class="two-col">
+        <div class="card">
+          <h4>Forward Algorithm (sum · L19 s.38)</h4>
+          <p class="plain">Total probability of <em>all</em> paths to each state:</p>
+          <div class="eq">f₁:ₜ₊₁ = α P(eₜ₊₁|Xₜ₊₁) ∑_{xₜ} P(Xₜ₊₁|xₜ) f₁:ₜ</div>
+        </div>
+        <div class="card">
+          <h4>Viterbi Algorithm (max · L19 s.38)</h4>
+          <p class="plain">Maximum probability of <em>any</em> path to each state:</p>
+          <div class="eq">m₁:ₜ₊₁ = P(eₜ₊₁|Xₜ₊₁) max_{xₜ} P(Xₜ₊₁|xₜ) m₁:ₜ</div>
+        </div>
+      </div>
+      <strong>Complexity (L19 s.40):</strong> Time <code>O(|X|² T)</code>, Space <code>O(|X| T)</code> — exponentially faster than enumerating all <code>O(|X|ᵀ)</code> paths.<br>
+      <strong>About L19 s.39's question ("Why can't we normalize here?") &amp; L19 s.41 (Log space):</strong> Normalizing <code>m₁:ₜ₊₁</code> changes the <em>numerical probability value</em> of the best path (so you lose the exact joint <code>P(x₀:ₜ, e₁:ₜ)</code>), <strong>but</strong> scaling every entry by the same positive constant <code>αₜ</code> preserves which path wins the <code>argmax</code>! That is why PS9 asks you to normalize messages at each step to prevent floating-point underflow, whereas production code usually works in negative log space (<code>argmin</code> of summed <code>−log P</code>, turning Viterbi into shortest-path search on the trellis, L19 s.41).
+    </div>
+
+    <div class="sig">def run_viterbi(hmm, observations) -&gt; list[tuple[int, int]]</div>
+
+    <h3>Step-by-step algorithm using the provided CPT helpers</h3>
+    <ol>
+      <li><strong>Initialize at <code>t = 0</code>:</strong>
+        <ul>
+          <li>Condition <code>hmm.observation_CPTs[0]</code> on <code>{hmm.observation_rvs[0]: observations[0]}</code>.</li>
+          <li>Multiply with <code>hmm.initial_distribution</code> and normalize:
+            <div class="eq">msg = normalize_CPT(multiply_CPTs([hmm.initial_distribution, obs0]))</div>
+          </li>
+          <li>Initialize an empty list <code>backpointers = []</code> (Option 1 on L19 s.40: <em>"Store the parent xₜ when computing m₁:ₜ₊₁"</em>).</li>
+        </ul>
+      </li>
+      <li><strong>Forward pass for <code>t = 1, …, T − 1</code>:</strong>
+        <ul>
+          <li>Condition <code>hmm.observation_CPTs[t]</code> on <code>{hmm.observation_rvs[t]: observations[t]}</code> to get <code>obs_t</code>.</li>
+          <li>Multiply the previous message, the transition CPT, and the conditioned observation CPT:
+            <div class="eq">joint = multiply_CPTs([msg, hmm.transition_CPTs[t - 1], obs_t])</div>
+            Now <code>joint</code> is a 2-variable CPT over <code>{S_{t-1}, S_t}</code>.</li>
+          <li>Record the best predecessor for each value of <code>S_t</code>:
+            <div class="eq">backpointers.append(argmax_CPT(joint, rv=hmm.state_rvs[t - 1]))</div>
+          </li>
+          <li>Maximize out <code>S_{t-1}</code> and normalize to prevent underflow:
+            <div class="eq">msg = normalize_CPT(max_CPT(joint, rv=hmm.state_rvs[t - 1]))</div>
+          </li>
+        </ul>
+      </li>
+      <li><strong>Backtrack from <code>T − 1</code> down to <code>0</code>:</strong>
+        <ul>
+          <li>Pick the best final state: <code>best_state = argmax_CPT(msg)[0]</code> (note <code>argmax_CPT(msg)</code> returns a 1-tuple when <code>rv=None</code>).</li>
+          <li>Loop <code>t</code> from <code>T - 2</code> down to <code>0</code>, looking up <code>best_state = backpointers[t].get_by_rvs({hmm.state_rvs[t + 1]: best_state})</code> and appending it.</li>
+          <li>Reverse the collected list so it runs from <code>t = 0</code> to <code>T − 1</code> and return it.</li>
+        </ul>
+      </li>
+    </ol>
+    <div class="hints" data-hints="p2f">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><strong>Hint 1.</strong> Notice <code>backpointers[t]</code> stores the mapping from <code>S_{t+1}</code> back to the maximizing <code>S_t</code> (for <code>t = 0, …, T-2</code>).</div>
+      <div class="hint" hidden><strong>Hint 2.</strong> Don't forget to unpack <code>argmax_CPT(msg)[0]</code> at the end — <code>argmax_CPT</code> with <code>rv=None</code> always returns a tuple of length <code>len(cpt.rvs)</code>.</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 3A -->
+  <section id="p3a">
+    <h2>3A · Adversarial Bayes net for rejection sampling</h2>
+    <p class="kicker">7 points · AI-enabled · Lecture 18 s.12, s.16–17, s.20</p>
+    <div class="lecture">
+      <strong>Lecture 18, Slides 12 &amp; 20 — Why Rejection Sampling Fails on Rare Joint Evidence:</strong><br>
+      Prior sampling draws complete assignments from the exact joint <code>S_PS(x₁,…,xₙ) = ∏ᵢ P(xᵢ | Parents(Xᵢ)) = P(x₁,…,xₙ)</code> (L18 s.12). Rejection sampling keeps only samples matching <code>E = e</code>, so its acceptance rate is <strong>exactly the joint likelihood <code>P(E = e)</code></strong> — even if every individual evidence variable <code>Eᵢ</code> has a high marginal probability <code>P(Eᵢ = eᵢ) ≥ 0.5</code>!
+    </div>
+    <div class="sig">def rejection_sampling_adversary() -&gt; tuple[list[CPT], dict[str, int]]</div>
+    <p>We want a small binary Bayes net (≤ 10 variables, every CPT entry in <code>[0.05, 0.95]</code>) and evidence on ≤ 3 variables such that:</p>
+    <ul>
+      <li>Every evidence variable is individually likely: <code>P(E_i = e_i) ≥ 0.5</code>.</li>
+      <li>The joint evidence is very unlikely: <code>P(E = e) ≤ 0.005</code> (so ≤ 80 of 8,000 samples accepted).</li>
+    </ul>
+
+    <h3>Why naive designs fall short — and how to fix it</h3>
+    <p>With only <strong>two</strong> negatively correlated variables <code>E1 → E2</code>, the best you can do with CPT entries in <code>[0.05, 0.95]</code> is <code>P(E1=1, E2=1) = 0.5 × 0.05 = 0.025</code> — still 5× too large!</p>
+    <p>With <strong>three</strong> evidence variables <code>E1, E2, E3</code>, we can stack <strong>two</strong> 0.05-scale conditional penalties by combining:</p>
+    <ol>
+      <li><strong>Strong anti-correlation</strong> between <code>E1</code> and <code>E2</code>:
+        <ul>
+          <li><code>P(E1 = 1) = 0.51</code> (marginally &gt; 0.5).</li>
+          <li><code>P(E2 = 1 | E1 = 0) = 0.95</code>, <code>P(E2 = 1 | E1 = 1) = 0.07</code>.</li>
+          <li>Marginal: <code>P(E2 = 1) = 0.49(0.95) + 0.51(0.07) = 0.5012 &gt; 0.5</code>.</li>
+          <li>Joint so far: <code>P(E1 = 1, E2 = 1) = 0.51 × 0.07 = 0.0357</code>.</li>
+        </ul>
+      </li>
+      <li><strong>A noisy NAND gate</strong> <code>(E1, E2) → E3</code>:
+        <ul>
+          <li><code>P(E3 = 1 | E1 = 1, E2 = 1) = 0.05</code>; for all other three pairs of <code>(E1, E2)</code>, <code>P(E3 = 1 | E1, E2) = 0.95</code>.</li>
+          <li>Marginal: <code>P(E3 = 1) = (1 − 0.0357)(0.95) + 0.0357(0.05) = 0.91787 ≫ 0.5</code>.</li>
+          <li>Joint of all three:
+            <div class="eq">P(E1=1, E2=1, E3=1) = 0.51 × 0.07 × 0.05 = 0.001785 ≤ 0.005</div>
+          </li>
+        </ul>
+      </li>
+    </ol>
+    <p>Out of 8,000 forward samples, only ~14 samples are expected to be accepted (~0.18%, well below the 80-sample / 1% ceiling).</p>
+
+    <div class="note">
+      <strong>Local grader note:</strong> The local copy of <code>principles_of_autonomy/notebook_tests/pset_9.py</code> does not include <code>test_12_rejection_adversary</code> (that test runs on Gradescope). <code>ProblemSet09_Gibbs_HMMs_complete.ipynb</code> includes a local verification cell right after <code>test_12</code> that checks all 5 exact conditions and runs 8,000 forward samples.
+    </div>
+    <div class="hints" data-hints="p3a">
+      <div class="row">
+        <button type="button" class="hint-next">Reveal a hint</button>
+        <button type="button" class="ghost hint-reset">Hide hints</button>
+        <span class="muted hint-count"></span>
+      </div>
+      <div class="hint" hidden><strong>Hint 1.</strong> Remember the CPT convention for 3A: list parents first and the child last (e.g., <code>CPT([E1, E2, E3], table)</code>), so <code>table[..., :]</code> sums to 1 along the last axis.</div>
+      <div class="hint" hidden><strong>Hint 2.</strong> Keeping all three marginals strictly above <code>0.5</code> (e.g., <code>0.51</code>, <code>0.5012</code>, <code>0.91787</code>) avoids any floating-point boundary issues with <code>≥ 0.5</code>.</div>
+    </div>
+  </section>
+
+  <!-- PROBLEM 3B -->
+  <section id="p3b">
+    <h2>3B · Explaining your Bayes net</h2>
+    <p class="kicker">3 points · NOT AI-enabled — write your own explanation</p>
+    <div class="warn">
+      <strong>Course policy reminder:</strong> Part 3B is explicitly marked <em>not</em> AI-enabled. Write the prose in your notebook yourself, in your own words.
+    </div>
+    <p>A clear, complete explanation should hit three points:</p>
+    <ol>
+      <li><strong>Graph structure:</strong> Name the variables and edges you used (e.g., <code>E1 → E2</code> and <code>(E1, E2) → E3</code>, or an anti-correlated chain <code>E1 → E2 → E3</code>).</li>
+      <li><strong>Why each marginal is high:</strong> Explain why each individual evidence event happens at least half the time when you average over its parents.</li>
+      <li><strong>Why the joint is tiny:</strong> Show how the chain rule multiplies multiple low conditional probabilities together (<code>P(E1=1) · P(E2=1 | E1=1) · P(E3=1 | E1=1, E2=1)</code>), causing rejection sampling to discard &gt;99.8% of samples.</li>
+    </ol>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="shared" id="checklist">
+    <h2>Quick checklist before submitting</h2>
+    <ul>
+      <li>Section 0 (Credit for Contributors) filled in.</li>
+      <li>All <code>raise NotImplementedError()</code> lines removed from your answer cells.</li>
+      <li>Problem 1 types match: <code>q1_answer</code> is an <code>int</code>; <code>q2_answer</code>/<code>q3_answer</code> are <code>'yes'</code>/<code>'no'</code>; <code>q4_answer</code>/<code>q5_answer</code> are tuples of uppercase strings.</li>
+      <li>Problem 2 tests <code>test_06</code>–<code>test_11</code> all pass; Viterbi normalizes messages at every step.</li>
+      <li>Problem 3A satisfies all 5 constraints (≤ 10 binary vars, CPT entries in <code>[0.05, 0.95]</code>, ≤ 3 evidence vars, marginals ≥ 0.5, joint ≤ 0.005).</li>
+      <li>Problem 3B explanation written in your own words.</li>
+      <li>Part 4 Google Form submitted and <code>form_confirmation_word</code> entered.</li>
+      <li>Notebook saved before uploading to Gradescope.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+  document.querySelectorAll(".hints").forEach((root) => {
+    const hints = [...root.querySelectorAll(".hint")];
+    const next = root.querySelector(".hint-next");
+    const reset = root.querySelector(".hint-reset");
+    const count = root.querySelector(".hint-count");
+    let shown = 0;
+    const paint = () => {
+      hints.forEach((h, i) => { h.hidden = i >= shown; });
+      count.textContent = shown === 0 ? "" : `${shown} / ${hints.length} hints`;
+      next.disabled = shown >= hints.length;
+    };
+    next.addEventListener("click", () => { shown = Math.min(hints.length, shown + 1); paint(); });
+    reset.addEventListener("click", () => { shown = 0; paint(); });
+    paint();
+  });
+</script>
+</body>
+</html>
